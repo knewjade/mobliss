@@ -18,7 +18,7 @@ export namespace mino {
     Left = 3,
   }
 
-  type PositionType = [number, number];
+  export type PositionType = [number, number];
 
   // inner namespaces
   namespace blocks {
@@ -50,7 +50,7 @@ export namespace mino {
     }
   }
 
-  namespace rotate {
+  namespace mino_rotation {
     export function next_right_rotate(current:Rotate): Rotate {
       return (current + 1) % 4;
     }
@@ -130,7 +130,7 @@ export namespace mino {
       }
 
       private get next_right_rotate(): Rotate {
-        return rotate.next_right_rotate(this._rotate);
+        return mino_rotation.next_right_rotate(this._rotate);
       }
 
       public rotate_left(): void {
@@ -144,7 +144,7 @@ export namespace mino {
       }
 
       private get next_left_rotate(): Rotate {
-        return rotate.next_left_rotate(this._rotate);
+        return mino_rotation.next_left_rotate(this._rotate);
       }
 
       public get positions(): PositionType[] {
