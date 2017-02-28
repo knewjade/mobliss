@@ -1,6 +1,86 @@
 import {mino as _mino} from 'mino';
 
 export namespace field {
+  namespace super_rotation_system {
+    let Type = _mino.Type;
+    let Rotate = _mino.Rotate;
+
+    type Rotate = _mino.Rotate;
+
+    let rotate_positions_to_right = _mino.rotate_positions_to_right;
+    let rotate_positions_to_left = _mino.rotate_positions_to_left;
+
+    let get_next_right_rotate = _mino.get_next_right_rotate;
+    let get_next_left_rotate = _mino.get_next_left_rotate;
+
+    export let rotate_testmap: { [type: number] : { [rotate: number] : PositionType[] }} = {};
+    rotate_testmap[Type.T] = {};
+    rotate_testmap[Type.S] = {};
+    rotate_testmap[Type.Z] = {};
+    rotate_testmap[Type.J] = {};
+    rotate_testmap[Type.L] = {};
+    rotate_testmap[Type.I] = {};
+    rotate_testmap[Type.O] = {};
+    rotate_testmap[Type.T][Rotate.Normal] = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+    rotate_testmap[Type.T][Rotate.Right] = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]];
+    rotate_testmap[Type.T][Rotate.Reverse] = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+    rotate_testmap[Type.T][Rotate.Left] = [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]];
+    rotate_testmap[Type.J][Rotate.Normal] = rotate_testmap[Type.L][Rotate.Normal] = rotate_testmap[Type.S][Rotate.Normal]
+      = rotate_testmap[Type.Z][Rotate.Normal] = rotate_testmap[Type.T][Rotate.Normal];
+    rotate_testmap[Type.J][Rotate.Right] = rotate_testmap[Type.L][Rotate.Right] = rotate_testmap[Type.S][Rotate.Right]
+      = rotate_testmap[Type.Z][Rotate.Right] = rotate_testmap[Type.T][Rotate.Right];
+    rotate_testmap[Type.J][Rotate.Reverse] = rotate_testmap[Type.L][Rotate.Reverse] = rotate_testmap[Type.S][Rotate.Reverse]
+      = rotate_testmap[Type.Z][Rotate.Reverse] = rotate_testmap[Type.T][Rotate.Reverse];
+    rotate_testmap[Type.J][Rotate.Left] = rotate_testmap[Type.L][Rotate.Left] = rotate_testmap[Type.S][Rotate.Left]
+      = rotate_testmap[Type.Z][Rotate.Left] = rotate_testmap[Type.T][Rotate.Left];
+    rotate_testmap[Type.I][Rotate.Normal] = [[0, 0], [-1, 0], [2, 0], [-1, 0], [2, 0]];
+    rotate_testmap[Type.I][Rotate.Right] = [[-1, 0], [0, 0], [0, 0], [0, 1], [0, -2]];
+    rotate_testmap[Type.I][Rotate.Reverse] = [[-1, 1], [1, 1], [-2, 1], [1, 0], [-2, 0]];
+    rotate_testmap[Type.I][Rotate.Left] = [[0, 1], [0, 1], [0, 1], [0, -1], [0, 2]];
+    rotate_testmap[Type.O][Rotate.Normal] = [[0, 0]];
+    rotate_testmap[Type.O][Rotate.Right] = [[0, -1]];
+    rotate_testmap[Type.O][Rotate.Reverse] = [[-1, -1]];
+    rotate_testmap[Type.O][Rotate.Left] = [[-1, 0]];
+
+    export function decide_right_rotation_pattern(x:number, y:number, field:Field, current_mino:Mino): [number, number] {
+      let type = current_mino.type;
+      let current_rotate = current_mino.rotate;
+      let next_rotate = get_next_right_rotate(current_rotate);
+
+      let current_map = rotate_testmap[type][current_rotate],
+          next_map = rotate_testmap[type][next_rotate];
+
+      let next_positions = rotate_positions_to_right(current_mino.positions);
+
+      for (let index = 0; index < current_map.length; index++) {
+        let pattern:PositionType = [current_map[index][0] - next_map[index][0], current_map[index][1] - next_map[index][1]];
+        if (field.checks_empty(x + pattern[0], y + pattern[1], next_positions))
+          return pattern;
+      }
+
+      return null;
+    }
+
+    export function decide_left_rotation_pattern(x:number, y:number, field:Field, current_mino:Mino): [number, number] {
+      let type = current_mino.type;
+      let current_rotate = current_mino.rotate;
+      let next_rotate = get_next_left_rotate(current_rotate);
+
+      let current_map = rotate_testmap[type][current_rotate],
+          next_map = rotate_testmap[type][next_rotate];
+
+      let next_positions = rotate_positions_to_left(current_mino.positions);
+
+      for (let index = 0; index < current_map.length; index++) {
+        let pattern:PositionType = [current_map[index][0] - next_map[index][0], current_map[index][1] - next_map[index][1]];
+        if (field.checks_empty(x + pattern[0], y + pattern[1], next_positions))
+          return pattern;
+      }
+
+      return null;
+    }
+  }
+
   type Block = _mino.Block;
   type Type = _mino.Type;
   type Mino = _mino.Mino;
@@ -103,6 +183,14 @@ export namespace field {
     public freeze(): Field {
       let new_field = this._field.map((line) => [].concat(line));
       return new Field(new_field);
+    }
+
+    public rotate_right(x:number, y:number, current_mino:Mino): [number, number] {
+      return super_rotation_system.decide_right_rotation_pattern(x, y, this, current_mino);
+    }
+
+    public rotate_left(x:number, y:number, current_mino:Mino): [number, number] {
+      return super_rotation_system.decide_left_rotation_pattern(x, y, this, current_mino);
     }
 
     public get is_perfect(): boolean {

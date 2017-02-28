@@ -51,12 +51,23 @@ export namespace mino {
   }
 
   namespace mino_rotation {
-    export function next_right_rotate(current:Rotate): Rotate {
+    let right_rotation_map: (current:[number, number])=>[number, number] = (current:[number, number]) => [current[1], current[0] ? -current[0] : 0];
+    let left_rotation_map: (current:[number, number])=>[number, number] = (current:[number, number]) => [current[1] ? -current[1] : 0, current[0]];
+
+    export function get_next_right_rotate(current:Rotate): Rotate {
       return (current + 1) % 4;
     }
 
-    export function next_left_rotate(current:Rotate): Rotate {
+    export function get_next_left_rotate(current:Rotate): Rotate {
       return (current + 3) % 4;
+    }
+
+    export function rotate_positions_to_right(positions:[number, number][]): [number, number][] {
+      return positions.map(right_rotation_map);
+    }
+
+    export function rotate_positions_to_left(positions:[number, number][]): [number, number][] {
+      return positions.map(left_rotation_map);
     }
   }
 
@@ -120,31 +131,25 @@ export namespace mino {
       }
 
       public rotate_right(): void {
-        for (let index in this._positions) {
-          let current = this._positions[index];
-          this._positions[index] = [current[1], current[0] ? -current[0] : 0];
-        }
+        this._positions = rotate_positions_to_right(this._positions);
         this._rotate = this.next_right_rotate;
         this._min_max_x = this.get_min_max_x();
         this._min_max_y = this.get_min_max_y();
       }
 
       private get next_right_rotate(): Rotate {
-        return mino_rotation.next_right_rotate(this._rotate);
+        return mino_rotation.get_next_right_rotate(this._rotate);
       }
 
       public rotate_left(): void {
-        for (let index in this._positions) {
-          let current = this._positions[index];
-          this._positions[index] = [current[1] ? -current[1] : 0, current[0]];
-        }
+        this._positions = rotate_positions_to_left(this._positions);
         this._rotate = this.next_left_rotate;
         this._min_max_x = this.get_min_max_x();
         this._min_max_y = this.get_min_max_y();
       }
 
       private get next_left_rotate(): Rotate {
-        return mino_rotation.next_left_rotate(this._rotate);
+        return mino_rotation.get_next_left_rotate(this._rotate);
       }
 
       public get positions(): PositionType[] {
@@ -187,6 +192,12 @@ export namespace mino {
 
   export let mino = minos.create_mino;
   export let mino_by_name = minos.create_mino_by_name;
+
+  export let rotate_positions_to_right = mino_rotation.rotate_positions_to_right;
+  export let rotate_positions_to_left = mino_rotation.rotate_positions_to_left;
+
+  export let get_next_right_rotate = mino_rotation.get_next_right_rotate;
+  export let get_next_left_rotate = mino_rotation.get_next_left_rotate;
 
   export type Mino = minos.Mino;
   export let Mino = minos.Mino;

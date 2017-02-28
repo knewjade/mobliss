@@ -621,6 +621,18 @@ describe("Mino", () => {
       }
     });
 
+    it("should create rotated mino", () => {
+      let expected = _mino.mino(Type.T);
+      expected.rotate_right();
+      expect(_mino.mino(Type.T, Rotate.Right).rotate).to.equal(expected.rotate);
+
+      expected.rotate_right();
+      expect(_mino.mino(Type.T, Rotate.Reverse).rotate).to.equal(expected.rotate);
+
+      expected.rotate_right();
+      expect(_mino.mino(Type.T, Rotate.Left).rotate).to.equal(expected.rotate);
+    });
+
     it("should create mino by name", () => {
       let expected_map: { [name: string] : Type } = {
         'T': Type.T,
