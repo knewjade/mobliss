@@ -1,0 +1,21 @@
+{
+  "version": "1.6.2",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "rootDirs":[
+      "./src/",
+      "./test/"
+    ],
+    "baseUrl": "./src/",
+    "outDir": "./dist/"
+  },
+  "include": [
+    "./src/**/*",
+    "./test/**/*"
+  ],
+  "exclude": [
+    "./node_modules/"
+  ]
+}
