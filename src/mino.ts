@@ -48,6 +48,10 @@ export namespace mino {
       }
       throw new RangeError('Not found type in block map');
     }
+
+    export function get_name_by_type(type:Type): string {
+      return create_block(type).name;
+    }
   }
 
   namespace mino_rotation {
@@ -187,6 +191,8 @@ export namespace mino {
   }
 
   // public
+  export let name_by_type = blocks.get_name_by_type;
+
   export let block = blocks.create_block;
   export let block_by_name = blocks.create_block_by_name;
 
