@@ -208,6 +208,9 @@ export namespace mino {
   export type Mino = minos.Mino;
   export let Mino = minos.Mino;
 
+  export const ALL_TYPES:Type[] = [Type.I, Type.L, Type.O, Type.Z, Type.T, Type.J, Type.S];
+  export const ALL_ROTATES:Rotate[] = [Rotate.Normal, Rotate.Right, Rotate.Reverse, Rotate.Left];
+
   // enums, types
   export interface Block {
     name: string;

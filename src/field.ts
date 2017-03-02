@@ -1,4 +1,5 @@
 import {mino as _mino} from 'mino';
+import {utillity as _utillity} from 'utillity';
 
 export namespace field {
   namespace super_rotation_system {
@@ -90,14 +91,7 @@ export namespace field {
   let block = _mino.block;
 
   export function create_initial_field(height:number, width:number): Field {
-    var blocks: Block[][] = Array.apply(null, Array(height)).map(() => {
-      return Array(width);
-    });
-    for (var index in blocks) {
-      blocks[index] = Array.apply(null, blocks[index]).map(() => {
-        return block(Type.Empty);
-      });
-    }
+    var blocks: Block[][] = _utillity.multidim_array([height, width], block(Type.Empty));
     return new Field(blocks);
   }
 
@@ -172,9 +166,7 @@ export namespace field {
       }
 
       for (let y = next; y < this.height; y++) {
-        this._field[y] = Array.apply(null, this._field[y]).map(() => {
-          return block(Type.Empty);
-        });
+        this._field[y] = this._field[y].map(() => block(Type.Empty));
       }
 
       return delete_count;
@@ -209,5 +201,15 @@ export namespace field {
         return prev_line_string +('0' + parseInt(current, 2).toString(36)).substr(-2);
       }, "");
     }
+
+    public to_bin(): void {
+      let k:number[][] = this._field.map((line) => {
+        return line.map((block) => { return block.type; })
+      });
+      console.log(k.reverse());
+    }
   }
+
+  export let decide_right_rotation_pattern = super_rotation_system.decide_right_rotation_pattern;
+  export let decide_left_rotation_pattern = super_rotation_system.decide_left_rotation_pattern;
 }
