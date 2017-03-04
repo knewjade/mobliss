@@ -30,7 +30,7 @@ export namespace tetfu {
     index: number,
   };
 
-  namespace consts {
+  export namespace consts {
     export const TETFU_FIELD_TOP:number = 23;
     export const TETFU_FIELD_HEIGHT:number = TETFU_FIELD_TOP + 1;  // フィールド23 + せり上がり1
     export const TETFU_FIELD_WIDTH:number = 10;
@@ -40,9 +40,11 @@ export namespace tetfu {
   namespace tables {
     const ENCODE_TABLE:string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     const ASCII_TABLE:string = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'; // ASCII文字テーブル
+    export const ENCODE_TABLE_SIZE:number = 64;
+    export const ASCII_TABLE_SIZE:number = 96;
 
     function encode_value_to_char(value:number): string {
-      return ENCODE_TABLE.charAt(value);
+      return ENCODE_TABLE[value];
     }
 
     function decode_value_from_char(char:string): number {
@@ -58,13 +60,23 @@ export namespace tetfu {
     }
 
     export function encode_comment_to_value(char:string): number {
-        return Math.max(ASCII_TABLE.indexOf(char), 0) % 96;
+        return Math.max(ASCII_TABLE.indexOf(char), 0) % ASCII_TABLE_SIZE;
       }
   }
+
+  export const ENCODE_MAX_VALUE:number = tables.ENCODE_TABLE_SIZE;
 
   namespace encoder {
     let mino = _mino.mino;
     let create_initial_field = _field.create_initial_field;
+
+    export function push_values(array:number[], value:number, split_count:number): void {
+      let current:number = value;
+      for (let count = 0; count < split_count; count++) {
+        array.push(current % ENCODE_MAX_VALUE);
+        current = Math.floor(current / ENCODE_MAX_VALUE);
+      }
+    }
 
     namespace inner {
       const TETFU_FIELD_BLOCKS = consts.TETFU_FIELD_BLOCKS;
@@ -72,16 +84,9 @@ export namespace tetfu {
       const TETFU_FIELD_WIDTH = consts.TETFU_FIELD_WIDTH;
       const TETFU_FIELD_TOP = consts.TETFU_FIELD_TOP;
 
-      function push_values(array:number[], value:number, split_count:number): void {
-        let current:number = value;
-        for (let count = 0; count < split_count; count++) {
-          array.push(current % 64);
-          current = Math.floor(current / 64);
-        }
-      }
-
       // フィールドをエンコードする
       // 前のフィールドがないときは空のフィールドを指定する
+      // 入力フィールドの高さは23, 幅は10
       export function encode_field(prev:Field, current:Field): [number[], boolean] {
         // 変数の初期化
         let values:number[] = [];
@@ -208,7 +213,7 @@ export namespace tetfu {
         for (let index = 0; index < comment.length; index += 4) {
           let value:number = 0;
           for (let count = 0; count < 4; count++)
-            value += tables.encode_comment_to_value(comment.charAt(index + count)) * (96 ** count);
+            value += tables.encode_comment_to_value(comment[index + count]) * (tables.ASCII_TABLE_SIZE ** count);
           push_values(values, value, 5);
         }
 
@@ -272,12 +277,12 @@ export namespace tetfu {
           // フィールドを記録して、リピートを終了する
           this._values = this._values.concat(values);
           this._last_repeat_index = -1;
-        } else if (this._last_repeat_index < 0 || 64 <= this._values[this._last_repeat_index]) {
+        } else if (this._last_repeat_index < 0 || ENCODE_MAX_VALUE <= this._values[this._last_repeat_index]) {
           // フィールドを記録して、リピートを開始する
           this._values = this._values.concat(values);
           this._values.push(0);
           this._last_repeat_index = this._values.length - 1;
-        } else if (this._values[this._last_repeat_index] < 63) {
+        } else if (this._values[this._last_repeat_index] < (ENCODE_MAX_VALUE - 1)) {
           // フィールドは記録せず、リピートを進める
           this._values[this._last_repeat_index] += 1;
         }
@@ -304,17 +309,18 @@ export namespace tetfu {
     const TETFU_FIELD_WIDTH = consts.TETFU_FIELD_WIDTH;
     const TETFU_FIELD_TOP = consts.TETFU_FIELD_TOP;
 
+    // 入力フィールドの高さは23, 幅は10
     export function decode_field(prev_field:Field, values:number[]): Field {
       // ひとつ前のフィールドのブロック種類を取得する関数
       let get_prev_block = (x:number, y:number) => 0 <= y ? prev_field.get_block(x, y).type : Type.Empty;
 
       let current = 0;
-      let field = _field.create_initial_field(TETFU_FIELD_HEIGHT, TETFU_FIELD_WIDTH);
+      let field = _field.create_initial_field(TETFU_FIELD_TOP, TETFU_FIELD_WIDTH);
 
       for (let index = 0; index < values.length; index += 2) {
         let x = current % 10,
             y = (TETFU_FIELD_TOP - Math.floor(current / 10) - 1),
-            value = values[index] + values[index + 1] * 64;
+            value = decode_value(values.slice(index, index + 2));
 
         // ブロック種類と個数を復元
         let type:number = Math.floor(value / TETFU_FIELD_BLOCKS) + get_prev_block(x, y) - 8;
@@ -332,12 +338,23 @@ export namespace tetfu {
 
       return field;
     }
+
+    export function decode_value(array:number[]): number {
+      let value:number = array[array.length - 1];
+      for (let index = array.length - 2; 0 <= index; index--) {
+        value *= ENCODE_MAX_VALUE;
+        value += array[index];
+      }
+      return value;
+    }
   }
 
+  // 入力フィールドの高さは23, 幅は10
   export function encode(field:Field, steps:[Type, Rotate, PositionType][]): string {
     return new encoder.Encoder().encode(field, steps);
   }
 
+  // 入力フィールドの高さは23, 幅は10
   export function encode_with_quiz(field:Field, steps:[Type, Rotate, PositionType][], mino_history:Type[]): string {
     let quiz:string = parse_quiz_comment(mino_history, steps[0][0]);
     return new encoder.Encoder().encode(field, steps, quiz);
@@ -359,13 +376,26 @@ export namespace tetfu {
     return escape(comment).substring(0,4095);
   }
 
+  // 入力フィールドの高さは23, 幅は10
   export function encode_field(prev_field:Field, current_field:Field): string {
     let values = encoder.encode_field(prev_field, current_field);
     return tables.encode(values);
   }
 
+  // 入力フィールドの高さは23, 幅は10
   export function decode_field(prev_field:Field, encoded:string): Field {
     let values:number[] = tables.decode(encoded);
     return decoder.decode_field(prev_field, values);
+  }
+
+  export function encode_value(value:number, split_count:number): string {
+    let values:number[] = [];
+    encoder.push_values(values, value, split_count)
+    return tables.encode(values);
+  }
+
+  export function decode_value(encoded:string): number {
+    let values = tables.decode(encoded);
+    return decoder.decode_value(values);
   }
 }

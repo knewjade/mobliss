@@ -152,24 +152,22 @@ export namespace field {
       return min_y;
     }
 
-    public clear(): number {
-      let next = 0;
-      let delete_count = 0;
-
+    public clear(): number[] {
+      // 削除するラインを列挙
+      let deletes:number[] = [];
       for (let y = 0; y < this.height; y++) {
-        if (this._field[y].every((element) => { return element.type != Type.Empty })) {
-          delete_count += 1;
-        } else {
-          this._field[next] = this._field[y];
-          next += 1;
-        }
+        if (this._field[y].every((element) => { return element.type != Type.Empty }))
+          deletes.push(y);
       }
 
-      for (let y = next; y < this.height; y++) {
-        this._field[y] = this._field[y].map(() => block(Type.Empty));
+      // すべてが揃ったラインを取り除いて、初期化して一番後ろに追加しなおす
+      let delete_indexes = deletes.map((value, index) => value - index);
+      for (let index of delete_indexes) {
+        let line:Block[][] = this._field.splice(index, 1);
+        this._field.push(line[0].map(() => block(Type.Empty)));
       }
 
-      return delete_count;
+      return deletes;
     }
 
     public freeze(): Field {
@@ -195,14 +193,15 @@ export namespace field {
       return this._field[y].every((e) => e.type === Type.Empty);
     }
 
-    public hash(max:number): string {
+    public hash(max:number=this.height): string {
       return this._field.slice(0, max).reduce((prev_line_string, current_line_array) => {
         let current = current_line_array.reduce((prev_string, current_block) => prev_string + (current_block.type !== Type.Empty ? 1 : 0), "");
         return prev_line_string +('0' + parseInt(current, 2).toString(36)).substr(-2);
       }, "");
     }
 
-    public to_bin(): void {
+    // for debug
+    public show_to_console(): void {
       let k:number[][] = this._field.map((line) => {
         return line.map((block) => { return block.type; })
       });

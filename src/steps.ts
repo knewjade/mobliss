@@ -45,34 +45,40 @@ export namespace steps {
     private _is_first_held: boolean = false;
     private _types:Type[] = [];
     private _order_history:string = "";
-    private _operation:string = "";
+    private _operations:string = "";
     private _pop_count:number = 0;
 
-    constructor(types:Type[], private min_count:number=1, private _bag_generator:() => Type[]=create_random_bag) {
+    constructor(types:Type[], private _min_count:number=1, private _bag_generator:() => Type[]=null) {
+      if (this._bag_generator === null)
+        this._bag_generator = create_random_bag;
       this.push_to_next(types);
-      this.pop_current();
+      this.pop_inner();
     }
 
-    public pop_current(): Type {
-      this.fill();
-
+    public next(): Type {
       if (this._is_held === false)
-        this._operation += 'v';
+        this._operations += 'v';
       else if (this._is_first_held === false)
-        this._operation += 'H';
+        this._operations += 'H';
       else
-        this._operation += 'X';
+        this._operations += 'X';
 
-      let temp:Type = this._current;
-      this._current = this._types.shift();
-      this._pop_count += 1;
+      let next_type:Type = this.pop_inner();
       this._is_held = false;
       this._is_first_held = false;
-      return temp;
+      return next_type;
+    }
+
+    private pop_inner(): Type {
+      this.fill();
+      let next_type = this._types.shift();
+      this._current = next_type;
+      this._pop_count += 1;
+      return next_type;
     }
 
     private fill(): void {
-      while (this._types.length <= this.min_count) {
+      while (this._types.length <= this._min_count) {
         let bag = this._bag_generator();
         this.push_to_next(bag);
       }
@@ -96,70 +102,119 @@ export namespace steps {
       return this._current;
     }
 
-    public hold(): void {
+    public hold(): Type {
       if (this._is_held === true)
-        return;
+        return null;
 
-      let temp:Type = this._hold;
+      let next_type:Type = this._hold;
       this._hold = this._current;
       this._is_held = true;
-      if (temp !== null) {
-        this._current = temp;
+      if (next_type !== null) {
+        this._current = next_type;
       } else {
         this._is_first_held = true;
-        this.pop_current();
+        next_type = this.pop_inner();
       }
+
+      return next_type;
     }
 
     public order_history(next_pop_count:number=0): string {
       return this._order_history.slice(0, this._pop_count);
     }
 
-    public undo(): void {
+    //　最後に置いたミノを返す
+    public undo(): Type {
       // 現在のミノでの復元
-      if (this._is_held === false) {
-        // そのまま設置
-        this._types.unshift(this._current);
-        this._current = block_by_name(this._order_history.charAt(this._pop_count - 2)).type;
-        this._pop_count -= 1;
-      } else if (this._is_first_held === false) {
-        // holdとの交換
-        this._types.unshift(this._hold);
-        this._hold = this._current;
-        this._current = block_by_name(this._order_history.charAt(this._pop_count - 2)).type;
-        this._pop_count -= 1;
-      } else {
-        // 初めてのhold
-        this._types.unshift(this._hold);
-        this._types.unshift(this._current);
-        this._hold = null;
-        this._current = block_by_name(this._order_history.charAt(this._pop_count - 3)).type;
-        this._pop_count -= 2;
+      if (this._is_held === true) {
+        if (this._is_first_held === true) {
+          // 初めてのhold
+          this._types.unshift(this._current);
+          this._current = this._hold;
+          this._hold = null;
+          this._pop_count -= 1;
+        } else {
+          // holdとの交換
+          let temp:Type = this._hold;
+          this._hold = this._current;
+          this._current = temp;
+        }
       }
 
       // ひとつ前のミノの操作を取得
-      let last_operation = this._operation.charAt(this._operation.length - 1);
-      this._operation = this._operation.slice(0, this._operation.length - 1);
-
-      // ひとつ前のミノでの復元
-      if (last_operation === 'v') {
-        // そのまま設置
-      } else if (last_operation === 'H') {
-        // holdとの交換
-        let temp:Type = this._hold;
-        this._hold = this._current;
-        this._current = temp;
-      } else if (last_operation === 'X') {
-        // 初めてのhold
-        this._types.unshift(this._hold);
-        this._hold = null;
-        this._current = block_by_name(this._order_history.charAt(this._pop_count - 2)).type;
-        this._pop_count -= 1;
-      }
+      let last_operation = this._operations[this._operations.length - 1];
+      this._operations = this._operations.slice(0, this._operations.length - 1);
 
       // holdを解除
       this._is_held = false;
       this._is_first_held = false;
+
+      // ひとつ前の最初の状況に復元
+      if (last_operation === 'v') {
+        // そのまま設置
+        this._types.unshift(this._current);
+        this._current = block_by_name(this._order_history[this._pop_count - 2]).type;
+        this._pop_count -= 1;
+
+        return this._current;
+      } else if (last_operation === 'X') {
+        // 初めてのhold
+        this._types.unshift(this._current);
+        this._current = this._hold;
+        this._hold = null;
+        this._pop_count -= 2;
+
+        return block_by_name(this._order_history[this._pop_count]).type;
+      } else if (last_operation === 'H') {
+        // holdとの交換
+        let prev_hold_index = this._operations.lastIndexOf('H') + 1;
+        if (prev_hold_index === 0)
+          prev_hold_index = this._operations.lastIndexOf('X');
+
+        this._types.unshift(this._current);
+        this._current = this._hold;
+        this._hold = block_by_name(this._order_history[prev_hold_index]).type;
+        this._pop_count -= 1;
+
+        return this._hold;
+      }
+    }
+
+    public freeze(): Steps {
+      let copy:Steps = new Steps(this._types, this._min_count, this._bag_generator);
+      copy._current = this._current;
+      copy._hold = this._hold;
+      copy._is_held = this._is_held;
+      copy._is_first_held = this._is_first_held;
+      copy._types = [].concat(this._types);
+      copy._order_history = this._order_history;
+      copy._operations = this._operations;
+      copy._pop_count = this._pop_count;
+      return copy;
+    }
+
+    public pack(): string {
+      return [this._order_history, this._operations, this._min_count.toString()].join(',');
+    }
+
+    // 接着ミノ順と復元後のStepsインスタンスを返却
+    static unpack(packed:string, bag_generator:() => Type[]=create_random_bag): Steps {
+      let split = packed.split(',');
+      let order_history = split[0];
+      let operations = split[1];
+      let min_count = parseInt(split[2]);
+
+      let types = order_history.split('').map((current) => block_by_name(current).type);
+
+      let copy:Steps = new Steps(types, min_count, bag_generator);
+
+      for (let operation of operations.split('')) {
+        if (operation !== 'v')
+          copy.hold()
+        copy.next();
+      }
+
+      return copy;
     }
   }
 }

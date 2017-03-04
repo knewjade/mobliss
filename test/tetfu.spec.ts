@@ -16,9 +16,14 @@ describe("Tetfu", () => {
 
   let encode_field = _tetfu.encode_field;
   let decode_field = _tetfu.decode_field;
+  let encode_value = _tetfu.encode_value;
+  let decode_value = _tetfu.decode_value;
+
+  const FIELD_HEIGHT = _tetfu.consts.TETFU_FIELD_TOP;
+  const FIELD_WIDTH = _tetfu.consts.TETFU_FIELD_WIDTH;
 
   it("should have encode 1", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let data = encode(field, [
       [Type.T, Rotate.Normal, [5, 0]],
     ]);
@@ -26,7 +31,7 @@ describe("Tetfu", () => {
   });
 
   it("should have encode 2", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let data = encode(field, [
       [Type.L, Rotate.Normal, [4, 0]],
       [Type.J, Rotate.Normal, [8, 0]],
@@ -41,7 +46,7 @@ describe("Tetfu", () => {
   });
 
   it("should have encode 3", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let data = encode(field, [
       [Type.I, Rotate.Reverse, [5, 0]],
       [Type.S, Rotate.Reverse, [5, 2]],
@@ -55,7 +60,7 @@ describe("Tetfu", () => {
   });
 
   it("should have encode 4 [Quiz]", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let data = encode_with_quiz(field, [
       [Type.L, Rotate.Right, [0, 1]],
     ], [
@@ -65,7 +70,7 @@ describe("Tetfu", () => {
   });
 
   it("should have encode 5 [Quiz]", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let data = encode_with_quiz(field, [
       [Type.L, Rotate.Right, [0, 1]],
       [Type.J, Rotate.Left, [3, 1]],
@@ -77,7 +82,7 @@ describe("Tetfu", () => {
   });
   //
   it("should have encode 6", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     field.set_mino(1, 0, mino(Type.I));
 
     let data = encode(field, [
@@ -87,7 +92,7 @@ describe("Tetfu", () => {
   });
 
   it("should have encode 7", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     field.set_mino(1, 0, mino(Type.I));
 
     let data = encode(field, [
@@ -97,16 +102,25 @@ describe("Tetfu", () => {
   });
 
   it("should have decode 1", () => {
-    let field = create_initial_field(23, 10);
+    let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     field.set_mino(4, 0, mino(Type.I));
 
-    let prev_field = create_initial_field(23, 10);
+    let prev_field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let encoded = encode_field(prev_field, field);
     let decoded = decode_field(prev_field, encoded);
 
     for (let y = 0; y < field.height; y++) {
       for (let x = 0; x < field.width; x++)
         expect(decoded.get_block(x, y).type).to.equal(field.get_block(x, y).type);
+    }
+  });
+
+  it("should have decode and encode value", () => {
+    let expecteds:number[] = [0, 293, 586, 1923, 5847, 29038, 83745, 103485, 262143]
+    for (let expected of expecteds) {
+      let encoded = encode_value(expected, 3);
+      expect(encoded).to.have.lengthOf(3)
+      expect(decode_value(encoded)).to.equal(expected);
     }
   });
 });

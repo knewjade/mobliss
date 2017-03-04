@@ -42,11 +42,11 @@ export namespace lock_searcher {
     private _mino_pool:{ [type: number] : { [rotate: number] : Mino } };
     private _nexts: [number, number, Rotate][];
 
-    constructor(private _field:Field, private _type:Type, search_max_height:number, appear_x:number=4, appear_y:number=20) {
+    constructor(private _field:Field, private _type:Type, search_max_height:number, appear_position:[number, number]=[4, 20]) {
       this._width = _field.width;
       this._height = _field.height;
       this._search_max_height = Math.min(search_max_height, this._height);
-      this._nexts =  [[appear_x, appear_y, Rotate.Normal]];
+      this._nexts =  [[appear_position[0], appear_position[1], Rotate.Normal]];
 
       this._spaceable = _utillity.multidim_array([ALL_ROTATES.length, this._height, this._width], undefined);
       this._lockable  = _utillity.multidim_array([ALL_ROTATES.length, this._height, this._width], undefined);

@@ -91,8 +91,8 @@ export namespace checkmate {
           let mino = this._mino_pool[next_type][rotate];
           let new_field = next_field.freeze();
           new_field.set_mino(x, y, mino);
-          let clear_line = new_field.clear();
-          let new_max_height = max_height - clear_line;
+          let clear_lines = new_field.clear();
+          let new_max_height = max_height - clear_lines.length;
 
           // パーフェクトなら終了
           if (new_field.is_perfect)

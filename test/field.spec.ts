@@ -107,16 +107,17 @@ describe("Field", () => {
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]);
 
-    let clear_line = field.clear();
+    let clear_lines = field.clear();
 
-    expect(clear_line).to.equal(3);
+    expect(clear_lines).to.deep.equal([0, 2, 5]);
+
     assert_field(field, [
       0, 1, 2, 3, 4, 5, 6, 7, 8,
       10, 11, 12, 13, 15, 16, 17, 18, 19,
       21, 22, 23, 24, 25, 26, 27, 28, 29,
     ]);
 
-    expect(field.clear()).to.equal(0);
+    expect(field.clear()).to.deep.equal([]);
   });
 
   it("should freeze", () => {
@@ -157,6 +158,7 @@ describe("Field", () => {
   it("should calc hash code of empty field", () => {
     let field = create_initial_field();
     expect(field.hash(5)).to.equal("0000000000");
+    expect(field.hash()).to.equal("0000000000000000000000000000000000000000000000");
   });
 
   it("should calc hash code 1", () => {
