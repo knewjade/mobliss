@@ -10,6 +10,7 @@ export namespace checkmate {
   type Field = _field.Field;
   type Mino = _mino.Mino;
   type LockCandidate = _lock_candidate.LockCandidate;
+  type LockSearcher = _lock_searcher.LockSearcher;
 
   let Type = _mino.Type;
   let Rotate = _mino.Rotate;
@@ -24,9 +25,8 @@ export namespace checkmate {
   export class Checkmate {
     private _memo:{ [key: string] : [Rotate, PositionType][] } = {};
     private _mino_pool:{ [type: number] : { [rotate: number] : Mino } };
-    private _lock_candidate:LockCandidate = new LockCandidate();
 
-    constructor() {
+    constructor(private _lock_candidate:LockCandidate) {
       this._mino_pool = {};
       for (let type of ALL_TYPES) {
         this._mino_pool[type] = {};
@@ -35,12 +35,14 @@ export namespace checkmate {
       }
     }
 
-    // 初手ホールドが可能であること
     public search_perfect(field:Field, types:Type[], hold:Type): boolean;
     public search_perfect(field:Field, types:Type[], hold:Type, max_count:number): boolean;
     public search_perfect(field:Field, types:Type[], hold:Type, max_count:number, max_clearline:number): boolean;
     public search_perfect(field:Field, types:Type[], hold:Type, max_count:number, max_clearline:number, is_held_already:boolean): boolean;
 
+    // max_count: パーフェクトまでにおけるミノ数
+    // max_clearline: パーフェクトまでに消すライン数
+    // is_held_already: 初手hold済みならtrue
     public search_perfect(field:Field, types:Type[], hold:Type, max_count?:number, max_clearline?:number, is_held_already?:boolean): boolean {
       if (hold === null)
         hold = types.shift();
@@ -81,7 +83,7 @@ export namespace checkmate {
         let max_height = next_type_field_height[2];
 
         // 次に置ける場所を探索
-        let candidates = this.get_next_candidates(next_field, next_type, max_height);
+        let candidates = this.get_next_candidates_with_memo(next_field, next_type, max_height);
         for (let candidate of candidates) {
           let rotate = candidate[0];
           let x = candidate[1][0];
@@ -137,36 +139,56 @@ export namespace checkmate {
     }
 
     // 次に置くことができる位置
-    private get_next_candidates(field:Field, type:Type, max_height:number): [Rotate, PositionType][] {
+    private get_next_candidates_with_memo(field:Field, type:Type, max_height:number): [Rotate, PositionType][] {
       let hash = field.hash(4) + type;
       if (hash in this._memo)
         return this._memo[hash];
 
       let searcher = new LockSearcher(field, type, max_height);
-
-      let candidates:[Rotate, PositionType][] = [];
-
-      for (let rotate of ALL_ROTATES) {
-        let mino = this._mino_pool[type][rotate];
-        let max_y = max_height - mino.max_y;
-
-        // 別の回転方向で確認できるか
-        if (this._lock_candidate.is_transposed_target(type, rotate))
-          continue;
-
-        // 次に置くことができる位置を列挙
-        let get_target_rotations = this._lock_candidate.get_target_rotations(type, rotate);
-        for (let target_rotate of get_target_rotations) {
-          let positions = searcher.search(target_rotate);
-          let new_candidate:PositionType[] = this._lock_candidate.transpose(type, target_rotate, positions);
-          let rotate_position:[Rotate, PositionType][] = new_candidate.filter((e) => e[1] < max_y).map((e): [Rotate, PositionType] => [rotate, e]);
-          candidates = candidates.concat(rotate_position);
-        }
-      }
+      let candidates = this.get_next_candidates_of_all_rotates(searcher, max_height);
 
       this._memo[hash] = candidates;
 
       return candidates;
+    }
+
+    private get_next_candidates_of_all_rotates(searcher:LockSearcher, max_height:number): [Rotate, PositionType][] {
+      let candidates:[Rotate, PositionType][] = [];
+
+      for (let rotate of ALL_ROTATES) {
+        let current:PositionType[] = this.get_next_candidates(searcher, rotate, max_height);
+        candidates = candidates.concat(current.map((e:PositionType):[Rotate, PositionType] => [rotate, e]));
+      }
+
+      return candidates;
+    }
+
+    public get_next_candidates(searcher:LockSearcher, rotate:Rotate, max_height:number): PositionType[] {
+      let candidates:PositionType[] = [];
+
+      let type = searcher.type;
+      let mino = this._mino_pool[type][rotate];
+      let max_y = max_height - mino.max_y;
+
+      // 別の回転方向で確認できるか
+      if (this._lock_candidate.is_transposed_target(type, rotate))
+        return candidates;
+
+      // 次に置くことができる位置を列挙
+      let get_target_rotations = this._lock_candidate.get_target_rotations(type, rotate);
+      for (let target_rotate of get_target_rotations) {
+        let positions = searcher.search(target_rotate);
+        let new_candidate:PositionType[] = this._lock_candidate.transpose(type, target_rotate, positions);
+        let filter_under_maxy:PositionType[] = new_candidate.filter((e) => e[1] < max_y);
+        candidates = candidates.concat(filter_under_maxy);
+      }
+
+      return candidates;
+    }
+
+    // あるrotateに対応するメイン回転方向を返却する
+    public get_main_rotation(type:Type, rotate:Rotate): Rotate {
+      return this._lock_candidate.get_main_rotation(type, rotate);
     }
   }
 }

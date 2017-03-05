@@ -90,6 +90,14 @@ export namespace steps {
       this._types = this._types.concat(types);
     }
 
+    public get_next(index:number): Type {
+      if (this._min_count <= index)
+        return undefined;
+
+      this.fill();
+      return this._types[index];
+    }
+
     public get next_count(): number {
       return this._types.length;
     }
@@ -100,6 +108,16 @@ export namespace steps {
 
     public get current_type(): Type {
       return this._current;
+    }
+
+    // TODO: write unittest
+    public get next_types(): Type[] {
+      return this._types;
+    }
+
+    // TODO: write unittest
+    public get is_held(): boolean {
+      return this._is_held;
     }
 
     public hold(): Type {
@@ -120,7 +138,32 @@ export namespace steps {
     }
 
     public order_history(next_pop_count:number=0): string {
-      return this._order_history.slice(0, this._pop_count);
+      if (this._min_count < next_pop_count)
+        next_pop_count = this._min_count;
+      return this._order_history.slice(0, this._pop_count + next_pop_count);
+    }
+
+    // TODO: write unittest
+    public get commit_history(): Type[] {
+      let hold:string = null;
+      let pointer:number = 0;
+      let types:string = "";
+      for (let index = 0; index < this._operations.length; index++) {
+        let o = this._operations[index];
+        if (o === 'v') {
+          types += this._order_history[pointer];
+          pointer++;
+        } else if (o === 'H') {
+          types += hold;
+          hold = this._order_history[pointer];
+          pointer++;
+        } else {
+          hold = this._order_history[pointer];
+          types += this._order_history[pointer + 1];
+          pointer += 2;
+        }
+      }
+      return types.split('').map((e) => block_by_name(e).type);
     }
 
     //　最後に置いたミノを返す

@@ -20,6 +20,7 @@ export namespace lock_candidate {
     constructor() {
       let testmap = this._testmap;
 
+      // 先頭の要素がメイン回転方向
       testmap[Type.S] = {};
       testmap[Type.S][Rotate.Normal] = testmap[Type.S][Rotate.Reverse] = [[Rotate.Normal, default_map], [Rotate.Reverse, down_map]];
       testmap[Type.S][Rotate.Right] = testmap[Type.S][Rotate.Left] = [[Rotate.Left, default_map], [Rotate.Right, right_map]];
@@ -50,7 +51,12 @@ export namespace lock_candidate {
       return [rotate];
     }
 
-    // positionを、対象の回転方向にしたときの位置へ移動させる
+    // あるrotateに対応するメイン回転方向を返却する
+    public get_main_rotation(type:Type, rotate:Rotate): Rotate {
+      return this.get_target_rotations(type, rotate)[0];
+    }
+
+    // 指定した回転方向時のpositionを、メイン回転方向時の位置へ移動させる
     public transpose(type:Type, rotate:Rotate, positions:PositionType[]): PositionType[] {
       return positions.map(this.get_testmap(type, rotate));
     }

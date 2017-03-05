@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import {mino as _mino} from 'mino';
 import {field as _field} from 'field';
+import {lock_candidate as _lock_candidate} from 'lock_candidate';
 import {checkmate as _checkmate} from 'checkmate';
 
 var expect = chai.expect;
@@ -8,6 +9,7 @@ var expect = chai.expect;
 describe("Checkmate", () => {
   let Type = _mino.Type;
   let Checkmate = _checkmate.Checkmate;
+  let LockCandidate = _lock_candidate.LockCandidate;
 
   let create_gray_field = _field.create_gray_field;
 
@@ -19,7 +21,7 @@ describe("Checkmate", () => {
       [1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = null;
     let types = [Type.T, Type.J, Type.I];
     expect(checkmate.search_perfect(field, types, hold)).to.be.true;
@@ -33,7 +35,7 @@ describe("Checkmate", () => {
       [1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = Type.O;
     let types = [Type.T, Type.I];
     expect(checkmate.search_perfect(field, types, hold)).to.be.true;
@@ -47,7 +49,7 @@ describe("Checkmate", () => {
       [1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = null;
     let types = [Type.Z, Type.I, Type.O, Type.L, Type.J, Type.T];
     expect(checkmate.search_perfect(field, types, hold, 3)).to.be.true;
@@ -61,7 +63,7 @@ describe("Checkmate", () => {
       [1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = Type.I;
     let types = [Type.J, Type.O, Type.S, Type.T, Type.I, Type.L];
     expect(checkmate.search_perfect(field, types, hold, 4)).to.be.true;
@@ -73,7 +75,7 @@ describe("Checkmate", () => {
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = Type.O;
     let types = [Type.I, Type.J, Type.O, Type.L, Type.T, Type.S, Type.Z];
     expect(checkmate.search_perfect(field, types, hold, 5, 2)).to.be.true;
@@ -89,7 +91,7 @@ describe("Checkmate", () => {
       [1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = Type.I;
     let types = [Type.J, Type.O, Type.Z, Type.O, Type.Z, Type.I];
     expect(checkmate.search_perfect(field, types, hold)).to.be.true;
@@ -105,7 +107,7 @@ describe("Checkmate", () => {
       [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = Type.O;
     let types = [Type.I, Type.O, Type.L, Type.J, Type.L, Type.S];
     expect(checkmate.search_perfect(field, types, hold)).to.be.true;
@@ -119,9 +121,23 @@ describe("Checkmate", () => {
       [1, 1, 1, 0, 0, 0, 1, 1, 1, 1],
     ]);
 
-    let checkmate = new Checkmate();
+    let checkmate = new Checkmate(new LockCandidate());
     let hold = Type.O;
     let types = [Type.L, Type.I, Type.S, Type.Z];
     expect(checkmate.search_perfect(field, types, hold, undefined, undefined, true)).to.be.false;
+  });
+
+  it("should find perfect pattern 9 [over types, hold, long]", function() {
+    let field = create_gray_field(23, 10, [
+      [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    ]);
+
+    let checkmate = new Checkmate(new LockCandidate());
+    let hold = Type.I;
+    let types = [Type.T, Type.Z, Type.J, Type.I, Type.L];
+    expect(checkmate.search_perfect(field, types, hold)).to.be.true;
   });
 });

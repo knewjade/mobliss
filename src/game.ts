@@ -7,6 +7,7 @@ export namespace game {
   type Field = _field.Field;
   type Mino = _mino.Mino;
   type Type = _mino.Type;
+  type PositionType = _mino.PositionType;
   type Rotate = _mino.Rotate;
   type Steps = _steps.Steps;
 
@@ -14,6 +15,7 @@ export namespace game {
   let Steps = _steps.Steps;
 
   let mino = _mino.mino;
+  let block_by_name = _mino.block_by_name;
   let create_initial_field = _field.create_initial_field;
   let encode_value = _tetfu.encode_value;
   let decode_value = _tetfu.decode_value;
@@ -29,13 +31,18 @@ export namespace game {
   export class Game {
     private _x:number;
     private _y:number;
+    private _clear_line_counter:number = 0;
     private _mino:Mino;
     private _commit_history:string = "";
 
     constructor(private _field:Field, private _steps:Steps, private _appear_position:[number, number]=[4, 20]) {
+      this.respawn();
+      this._mino = mino(this._steps.current_type, Rotate.Normal);
+    }
+
+    public respawn(): void {
       this._x = this._appear_position[0];
       this._y = this._appear_position[1];
-      this._mino = mino(this._steps.current_type, Rotate.Normal);
     }
 
     public rotate_right(): void {
@@ -80,6 +87,22 @@ export namespace game {
       this._y = this._field.harddrop(this._x, this._y, this._mino);
     }
 
+    // TODO: write unittest
+    public teleport(x:number, y:number, rotate:Rotate): void {
+      let rotate_count:number = (rotate - this._mino.rotate + 4) % 4;
+      if (rotate_count === 1) {
+        this._mino.rotate_right();
+      } else if (rotate_count === 2) {
+        this._mino.rotate_right();
+        this._mino.rotate_right();
+      } else if (rotate_count === 3) {
+        this._mino.rotate_left();
+      }
+
+      this._x = x;
+      this._y = y;
+    }
+
     public harddrop(): void {
       this.move_bottom();
       this.commit();
@@ -88,43 +111,47 @@ export namespace game {
     public commit(): void {
       this._field.set_mino(this._x, this._y, this._mino);
       let clear_lines = this._field.clear();
+      this._clear_line_counter += clear_lines.length;
 
-      this.record(this._x, this._y, this._mino.rotate, clear_lines);
-
-      this._x = this._appear_position[0];
-      this._y = this._appear_position[1];
+      this.record(this._x, this._y, this._mino.rotate);
 
       let next_type = this._steps.next();
-
       this._mino = mino(next_type);
+
+      this.respawn();
     }
 
-    public record(x:number, y:number, rotate:Rotate, clear_lines:number[]): void {
-      this._commit_history += this.encode_position_and_rotate(x, y, rotate);
+    public record(x:number, y:number, rotate:Rotate): void {
+      this._commit_history += this.encode_position_and_rotate(rotate, x, y);
     }
 
-    private encode_position_and_rotate(x:number, y:number, rotate:Rotate): string {
+    private encode_position_and_rotate(rotate:Rotate, x:number, y:number): string {
       return encode_value(x + y * FIELD_WIDTH + rotate * FIELD_BLOCKS, 2);
     }
 
-    private decode_position_and_rotate(encoded:string): [number, number, Rotate] {
+    private decode_position_and_rotate(encoded:string): [Rotate, PositionType] {
       let value = decode_value(encoded);
       let x = value % FIELD_WIDTH;
-      value = Math.floor(value / FIELD_HEIGHT);
+      value = Math.floor(value / FIELD_WIDTH);
       let y = value % FIELD_HEIGHT;
       value = Math.floor(value / FIELD_HEIGHT);
       let rotate = <Rotate>(value % 4);
-      return [x, y, rotate];
+      return [rotate, [x, y]];
     }
 
-    public hold(): void {
+    public hold(): boolean {
       let next_type = this._steps.hold();
       if (next_type === null)
-        return;
+        return false;
 
       this._x = this._appear_position[0];
       this._y = this._appear_position[1];
       this._mino = mino(next_type);
+      return true;
+    }
+
+    public get_next(index:number): Type {
+      return this._steps.get_next(index);
     }
 
     public get x(): number {
@@ -151,10 +178,29 @@ export namespace game {
       return this._steps;
     }
 
+    public get clear_line_count(): number {
+      return this._clear_line_counter;
+    }
+
+    // TODO: write unittest
+    public get commit_history(): [Type, Rotate, PositionType][] {
+      var reg = new RegExp(".{2}", "g");
+      var splited = this._commit_history.match(reg);
+      let rotate_positions:[Rotate, PositionType][] = splited.map(this.decode_position_and_rotate);
+      let types:Type[] = this._steps.commit_history;
+      return rotate_positions.map((rotate_position, index):[Type, Rotate, PositionType] => [types[index], rotate_position[0], rotate_position[1]]);
+    }
+
+    // TODO: write unittest
+    public get order_history(): Type[] {
+      return this._steps.order_history(this._steps.next_count).split('').map((name) => block_by_name(name).type);
+    }
+
     public freeze(): Game {
       let game = new Game(this._field.freeze(), this._steps.freeze(), <[number, number]>[].concat(this._appear_position));
       game._x = this._x;
       game._y = this._y;
+      game._clear_line_counter = this._clear_line_counter;
       game._mino = mino(this._mino.type, this._mino.rotate);
       game._commit_history = this._commit_history;
 
@@ -168,7 +214,7 @@ export namespace game {
       let packed_steps = this._steps.pack();
       let packed_appear = this.encode_position(this._appear_position[0], this._appear_position[1]);
 
-      return [encoded_field, packed_steps, packed_appear, this._commit_history].join('=');
+      return [encoded_field, packed_steps, packed_appear, this._commit_history, this._clear_line_counter.toString()].join('=');
     }
 
     private encode_position(x:number, y:number): string {
@@ -181,6 +227,7 @@ export namespace game {
       let unpacked_steps = split[1];
       let unpacked_appear = split[2];
       let commit_history = split[3];
+      let clear_line_counter = parseInt(split[4]);
 
       let prev_field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
       let field = decode_field(prev_field, unpacked_field);
@@ -192,6 +239,7 @@ export namespace game {
 
       game._x = appear_position[0];
       game._y = appear_position[1];
+      game._clear_line_counter = clear_line_counter;
       game._mino = mino(steps.current_type, Rotate.Normal);
       game._commit_history = commit_history;
 

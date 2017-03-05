@@ -52,7 +52,7 @@ export namespace tetfu {
     }
 
     export function encode(values:number[]): string {
-      return values.map(encode_value_to_char).reduce((prev, current, index) => prev + (index % 47 == 41 ? '?' : '') + current, "");
+      return values.map(encode_value_to_char).reduce((prev, current, index) => prev + current, "");
     }
 
     export function decode(encoded:string): number[] {
@@ -351,13 +351,15 @@ export namespace tetfu {
 
   // 入力フィールドの高さは23, 幅は10
   export function encode(field:Field, steps:[Type, Rotate, PositionType][]): string {
-    return new encoder.Encoder().encode(field, steps);
+    let data = new encoder.Encoder().encode(field, steps);
+    return data.split('').reduce((prev, current, index) => prev + current + (index % 47 == 41 ? '?' : ''), "");
   }
 
   // 入力フィールドの高さは23, 幅は10
   export function encode_with_quiz(field:Field, steps:[Type, Rotate, PositionType][], mino_history:Type[]): string {
     let quiz:string = parse_quiz_comment(mino_history, steps[0][0]);
-    return new encoder.Encoder().encode(field, steps, quiz);
+    let data = new encoder.Encoder().encode(field, steps, quiz);
+    return data.split('').reduce((prev, current, index) => prev + current + (index % 47 == 41 ? '?' : ''), "");
   }
 
   function parse_quiz_comment(mino_history:Type[], first_type:Type): string {

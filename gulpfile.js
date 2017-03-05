@@ -25,6 +25,17 @@ gulp.task('test', function(callback) {
   );
 });
 
+gulp.task('build', function(callback) {
+  runsequence(
+    'clean:output',
+    'compile:ts',
+    'copy:html',
+    'copy:img',
+    'browserify:js',
+    callback
+  );
+});
+
 // フォルダを空にする
 gulp.task('clean:output', function(){
   return del.sync([OUTPUT_DIRNAME]);
@@ -62,4 +73,23 @@ gulp.task('test:spec.js', function(){
     .src(targets, {read: false})
     .pipe(mocha({env: {'NODE_PATH': node_path}}))
     .on('error', () => { process.exit(0); });
+});
+
+// browserifyの実行
+gulp.task('browserify:js', function(){
+  return browserify({
+      entries: [OUTPUT_DIRNAME + '/src/main.js'],
+      paths: [OUTPUT_DIRNAME + '/src'],
+    })
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(gulp.dest(OUTPUT_DIRNAME + '/js'));
+});
+
+// ts
+gulp.task('clean:build.post', function(){
+  return del.sync([
+    OUTPUT_DIRNAME + '/src',
+    OUTPUT_DIRNAME + '/test'
+  ]);
 });

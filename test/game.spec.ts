@@ -107,6 +107,7 @@ describe("Game", () => {
 
     expect(freeze.x).to.equal(game.x);
     expect(freeze.y).to.equal(game.y);
+    expect(freeze.clear_line_count).to.equal(game.clear_line_count);
 
     game.rotate_right();
 
@@ -133,6 +134,7 @@ describe("Game", () => {
     // 最後のミノの操作は消える
     expect(unpacked.x).to.equal(4);
     expect(unpacked.y).to.equal(20);
+    expect(unpacked.clear_line_count).to.equal(0);
     expect(unpacked.current_mino.type).to.equal(game.hold_type);
     expect(unpacked.current_mino.rotate).to.equal(Rotate.Normal);
     expect(unpacked.steps.pack()).to.equal(game.steps.pack());

@@ -28,6 +28,16 @@ describe("Steps", () => {
     expect(steps.next_count).to.be.least(min_count);
   });
 
+  it("should get next mino", () => {
+    let generator: () => Type[] = (): Type[] => ALL_TYPES;
+    let steps = new Steps([], 6, generator);
+
+    for (let index = 0; index < 6; index++)
+      expect(steps.get_next(index)).to.equal(ALL_TYPES[index + 1]);
+
+    expect(steps.get_next(6)).to.be.undefined;
+  });
+
   it("should decide mino order by generator", () => {
     let generator: () => Type[] = (): Type[] => ALL_TYPES;
     let steps = new Steps([], 1, generator);

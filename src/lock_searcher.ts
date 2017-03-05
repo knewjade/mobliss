@@ -43,6 +43,9 @@ export namespace lock_searcher {
     private _nexts: [number, number, Rotate][];
 
     constructor(private _field:Field, private _type:Type, search_max_height:number, appear_position:[number, number]=[4, 20]) {
+      if (appear_position[0] < 0 || _field.width <= appear_position[0] || appear_position[1] < 0 || _field.height <= appear_position[1])
+        throw RangeError('appear position is out in field');
+
       this._width = _field.width;
       this._height = _field.height;
       this._search_max_height = Math.min(search_max_height, this._height);
@@ -281,6 +284,10 @@ export namespace lock_searcher {
         let position = decide_rotation_pattern(x, y, this._field, mino);
         this._rotatable[current_rotate][action][y][x] = position;
       }
+    }
+
+    public get type(): Type {
+      return this._type;
     }
   }
 }
