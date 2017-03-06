@@ -75,8 +75,7 @@ export namespace controller {
 
       this.stock();
       this._game.teleport(x, y, rotate);
-      this._game.commit();
-      this.spawn();
+      this.commit();
       this.update_searcher();
       this.update_all_canvas();
     }
@@ -119,17 +118,22 @@ export namespace controller {
 
     public harddrop(): void {
       this.stock();
-      this._game.harddrop();
-      this.spawn();
+      this._game.move_bottom();
+      this.commit();
       this.update_searcher();
       this.update_all_canvas();
+    }
+
+    public commit(): void {
+      this._game.commit();
+      this.spawn();
+      this._game_recorder(this);
     }
 
     public stock(): void {
       if (MAX_UNDO <= this._stock_games.length)
         this._stock_games.shift();
       this._stock_games.push(this._game.pack());
-      this._game_recorder(this);
     }
 
     public undo(): void {

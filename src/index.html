@@ -5,17 +5,33 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="initial-scale=1.0">
   <title>sample</title>
+  <style>
+    canvas {
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      visibility: hidden;
+    }
+  </style>
 </head>
 <body>
-  <canvas id="background" width="375" height="647" style="position:fixed; left:0px; top:0px; z-index:1" class="canvas">
+  <canvas id="background" width="375" height="647" style="z-index:10" class="canvas">
 		Your browser does not support HTML5 Canvas.
 	</canvas>
-  <canvas id="main" width="375" height="647" style="position:fixed; left:0px; top:0px; z-index:2" class="canvas">
+  <canvas id="background_second" width="375" height="647" style="z-index:10" class="canvas">
 	</canvas>
-  <canvas id="dynamic" width="375" height="647" style="position:fixed; left:0px; top:0px; z-index:2" class="canvas">
+  <canvas id="main" width="375" height="647" style="z-index:20" class="canvas">
 	</canvas>
-  <canvas id="event" width="375" height="647" style="position:fixed; left:0px; top:0px; z-index:10" class="canvas">
+  <canvas id="main_second" width="375" height="647" style="z-index:20" class="canvas">
 	</canvas>
+  <canvas id="dynamic" width="375" height="647" style="z-index:30" class="canvas">
+	</canvas>
+  <canvas id="dynamic_second" width="375" height="647" style="z-index:30" class="canvas">
+	</canvas>
+  <canvas id="event" width="375" height="647" style="z-index:100" class="canvas">
+	</canvas>
+
+  <div id=debug_text></div>
 
   <script type="text/javascript" src="js/bundle.js"></script>
 </body>

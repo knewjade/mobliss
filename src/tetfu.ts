@@ -277,7 +277,7 @@ export namespace tetfu {
           // フィールドを記録して、リピートを終了する
           this._values = this._values.concat(values);
           this._last_repeat_index = -1;
-        } else if (this._last_repeat_index < 0 || ENCODE_MAX_VALUE <= this._values[this._last_repeat_index]) {
+        } else if (this._last_repeat_index < 0 || this._values[this._last_repeat_index] == ENCODE_MAX_VALUE - 1) {
           // フィールドを記録して、リピートを開始する
           this._values = this._values.concat(values);
           this._values.push(0);

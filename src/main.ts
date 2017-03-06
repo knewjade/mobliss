@@ -39,11 +39,11 @@ namespace main {
   const SESSION_GAME_NAME = "Game";
 
   class Main {
-    constructor(image_loader:ImageLoader, is_centering:boolean) {
+    constructor(image_loader:ImageLoader, is_mobile:boolean, is_centering:boolean) {
       let canvas_size:[number, number] = [window.innerWidth, window.innerHeight];
       let screen_size:[number, number] = [375, 647];
 
-      let event = new EventController('event', canvas_size, screen_size, is_centering);
+      let event = new EventController('event', canvas_size, screen_size, is_centering, is_mobile);
 
       let main = new Canvas('main', canvas_size, screen_size, is_centering);
       let background = new Canvas('background', canvas_size, screen_size, is_centering);
@@ -65,9 +65,9 @@ namespace main {
       event.setup_click_event(this.invoke_click_callback(event, controller));
       event.setup_keydown_event(this.invoke_keyboard_callback(controller));
 
-      background.add_draw_event(this.draw_background(image_loader));
-      main.add_draw_event(this.draw_main(image_loader, controller));
-      dynamic.add_draw_event(this.draw_dynamic(image_loader, controller));
+      background.add_draw_event(this.create_draw_background_event(image_loader));
+      main.add_draw_events(this.create_draw_main_events(image_loader, controller));
+      dynamic.add_draw_events(this.create_draw_dynamic_events(image_loader, controller));
 
       background.update();
       main.update();
@@ -75,7 +75,7 @@ namespace main {
     }
 
     // 背景や空のフィールド
-    public draw_background(image_loader:ImageLoader): (canvas:Canvas) => void {
+    public create_draw_background_event(image_loader:ImageLoader): (canvas:Canvas) => void {
       return (canvas:Canvas) => {
         // console.log('draw background');
 
@@ -125,7 +125,7 @@ namespace main {
     }
 
     // すでに設置したフィールドやNextなど
-    public draw_main(image_loader:ImageLoader, controller:Controller): (canvas:Canvas) => void {
+    public create_draw_main_events(image_loader:ImageLoader, controller:Controller): ((canvas:Canvas) => void)[] {
       function draw_mini_tetrimino(canvas:Canvas, mino:Mino, next_block_size:number, left_top:[number, number], half_box_size:[number, number]): void {
         let positions = mino.positions;
         let center = [left_top[0] + half_box_size[0], left_top[1] + half_box_size[1]];
@@ -137,13 +137,9 @@ namespace main {
         }
       }
 
-      return (canvas:Canvas) => {
-        // console.log('draw main');
-
-        let game = controller.game;
-        let field = game.field;
-
-        // フィールド
+      // フィールドの描画
+      let field_event = (canvas:Canvas) => {
+        let field = controller.game.field;
         let block_size = points.field.BLOCK_SIZE;
         for (let y = 0; y < FIELD_HEIGHT; y++) {
           for (let x = 0; x < FIELD_WIDTH; x++) {
@@ -153,38 +149,41 @@ namespace main {
               canvas.draw_image(image_loader.get_block(type), block_point[0], block_point[1], block_size, block_size);
           }
         }
-
-        // next
-        for (let index = 0; index < points.NEXT_COUNT; index++) {
-          let next_type = game.get_next(index);
-          let left_top = points.next.each_box(index);
-          draw_mini_tetrimino(canvas, mino(next_type), 12, left_top, [points.next.HALF_BOX_SIZE, points.next.HALF_BOX_SIZE]);
-        }
-
-        // hold
-        let hold_type = game.hold_type;
-        if (hold_type !== null)
-          draw_mini_tetrimino(canvas, mino(hold_type), 12, points.hold.LEFT_TOP, [points.hold.HALF_BOX_SIZE, points.hold.HALF_BOX_SIZE]);
       };
+
+      // ネクストの描画
+      let next_event = (canvas:Canvas) => {
+        let half_box_size = points.next.HALF_BOX_SIZE;
+        for (let index = 0; index < points.NEXT_COUNT; index++) {
+          let next_type = controller.game.get_next(index);
+          let left_top = points.next.each_box(index);
+          draw_mini_tetrimino(canvas, mino(next_type), 12, left_top, [half_box_size, half_box_size]);
+        }
+      };
+
+      // ホールドの描画
+      let hold_event = (canvas:Canvas) => {
+        let half_box_size = points.hold.HALF_BOX_SIZE;
+        let hold_type = controller.game.hold_type;
+        if (hold_type !== null)
+          draw_mini_tetrimino(canvas, mino(hold_type), 12, points.hold.LEFT_TOP, [half_box_size, half_box_size]);
+      };
+
+      return [field_event, next_event, hold_event];
     }
 
-    // 現在位置・接着候補・ゴースト
-    public draw_dynamic(image_loader:ImageLoader, controller:Controller): (canvas:Canvas) => void {
-      return (canvas:Canvas) => {
-        // console.log('draw dynamic');
-
+    // 現在位置・接着候補・ゴースト・パーフェクトフラグ
+    public create_draw_dynamic_events(image_loader:ImageLoader, controller:Controller): ((canvas:Canvas) => void)[] {
+      // 現在位置・接着候補・ゴーストの描画
+      let mino_event = (canvas:Canvas) => {
         let game = controller.game;
-        let field = game.field;
         let current_mino = game.current_mino;
         let type = current_mino.type;
-        let rotate = current_mino.rotate;
         let x = game.x;
         let y = game.y;
         let harddropy = game.field.harddrop(x, y, current_mino);
-
         let block_size = points.field.BLOCK_SIZE;
 
-        // 現在位置・ゴースト
         for (let position of current_mino.positions) {
           let image = image_loader.get_block(type);
 
@@ -200,16 +199,21 @@ namespace main {
             canvas.draw_image(image, ghost_block_point[0], ghost_block_point[1], block_size, block_size, 0.3);
           }
         }
+      };
 
-        // 接着候補
+      // 接着候補の描画
+      let candidates_event = (canvas:Canvas) => {
+        let block_size = points.field.BLOCK_SIZE;
         let candidates = controller.candidates;
         let image_candidate = image_loader.get('Candidate');
         for (let candidate of candidates) {
           let block_point = points.field.each_block(candidate[0], candidate[1]);
-          canvas.draw_image(image_candidate, block_point[0], block_point[1], points.field.BLOCK_SIZE, points.field.BLOCK_SIZE);
+          canvas.draw_image(image_candidate, block_point[0], block_point[1], block_size, block_size);
         }
+      };
 
-        // パーフェクトフラグ
+      // パーフェクトフラグの描画
+      let perfect_event = (canvas:Canvas) => {
         let perfect_status = controller.perfect_status;
         if (perfect_status === PerfectStatus.FOUND) {
           canvas.draw_box(points.perfect.LEFT_TOP, points.perfect.BOX_SIZE, "rgb(33, 170, 33)");
@@ -221,11 +225,15 @@ namespace main {
           canvas.draw_box(points.perfect.LEFT_TOP, points.perfect.BOX_SIZE, "rgb(33, 33, 33)");
         }
       };
+
+      return [mino_event, candidates_event, perfect_event];
     }
 
     public invoke_click_callback(event:EventController, controller:Controller): (x:number, y:number) => void {
       return (x:number, y:number) => {
         // console.log('click', x, y);
+        // document.getElementById('debug_text').innerHTML += 'click<br>';
+        
         let position = event.transpose_position_to_screen(x, y);
         let component = points.get_touch_component(position[0], position[1]);
 
@@ -276,13 +284,13 @@ namespace main {
     }
   }
 
-  function is_centering(): boolean {
+  function is_mobile(): boolean {
     var ua = navigator.userAgent;
 
     if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPod') > 0 || ua.indexOf('Android') > 0 && ua.indexOf('Mobile') > 0) {
-      return false;
+      return true;
     } else if (ua.indexOf('iPad') > 0 || ua.indexOf('Android') > 0) {
-      return false;
+      return true;
     } else {
       return false;
     }
@@ -292,8 +300,9 @@ namespace main {
     let image_loader = new ImageLoader();
     image_loader.wait_for_complete(() => {
       console.log('all completed');
-      let center_flag = is_centering();
-      new Main(image_loader, center_flag);
+      let mobile_flag = is_mobile();
+      let center_flag = mobile_flag;
+      new Main(image_loader, mobile_flag, center_flag);
     });
   }
 }

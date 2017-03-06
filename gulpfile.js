@@ -32,6 +32,7 @@ gulp.task('build', function(callback) {
     'copy:html',
     'copy:img',
     'browserify:js',
+    'clean:build.post',
     callback
   );
 });
@@ -86,7 +87,7 @@ gulp.task('browserify:js', function(){
     .pipe(gulp.dest(OUTPUT_DIRNAME + '/js'));
 });
 
-// ts
+// build終了後、必要のないファイルを削除
 gulp.task('clean:build.post', function(){
   return del.sync([
     OUTPUT_DIRNAME + '/src',

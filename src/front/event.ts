@@ -11,30 +11,45 @@ export namespace event {
   export class EventController {
     private _canvas:Canvas;
 
-    constructor(id:string, canvas_size:[number, number], screen_size:[number, number], is_centering:boolean) {
-      this._canvas = new Canvas(id, canvas_size, screen_size, is_centering);
+    constructor(id:string, canvas_size:[number, number], screen_size:[number, number], is_centering:boolean, private _is_mobile:boolean) {
+      this._canvas = new Canvas(id, canvas_size, screen_size, is_centering, false);
     }
 
     public setup_click_event(callback:(x:number, y:number) => void): void {
       if (!callback)
         return;
 
-      function onClick(e:MouseEvent) {
-        /*
-         * rectでcanvasの絶対座標位置を取得し、
-         * クリック座標であるe.clientX,e.clientYからその分を引く
-         * ※クリック座標はdocumentからの位置を返すため
-         * ※rectはスクロール量によって値が変わるので、onClick()内でつど定義
-         */
-        let target:HTMLInputElement = <HTMLInputElement> e.target;
-        let rect = target.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+      // EventListnerに追加
+      if (this._is_mobile === true) {
+        let onClick = (e:TouchEvent) => {
+          // タッチの情報を含むオブジェクト
+          var touchObj = e.changedTouches[0];
 
-        callback(x, y);
+          let target:HTMLInputElement = <HTMLInputElement> touchObj.target;
+          let rect = target.getBoundingClientRect();
+          let x = touchObj.clientX - rect.left;
+          let y = touchObj.clientY - rect.top;
+
+          callback(x, y);
+        };
+        this._canvas.addEventListener('touchstart', onClick, true);
+      } else {
+        let onClick = (e:MouseEvent) => {
+          /*
+           * rectでcanvasの絶対座標位置を取得し、
+           * クリック座標であるe.clientX,e.clientYからその分を引く
+           * ※クリック座標はdocumentからの位置を返すため
+           * ※rectはスクロール量によって値が変わるので、onClick()内でつど定義
+           */
+          let target:HTMLInputElement = <HTMLInputElement> e.target;
+          let rect = target.getBoundingClientRect();
+          let x = e.clientX - rect.left;
+          let y = e.clientY - rect.top;
+
+          callback(x, y);
+        };
+        this._canvas.addEventListener('click', onClick, true);
       }
-
-      this._canvas.addEventListener('click', onClick, false);
     }
 
     public setup_keydown_event(callback:(name:string) => void): void {
@@ -109,8 +124,10 @@ export namespace event {
       }
 
       // EventListnerに追加
-      document.addEventListener('keydown', onKeyDown, false);
-      document.addEventListener('keyup', onKeyUp, false);
+      if (this._is_mobile === false) {
+        document.addEventListener('keydown', onKeyDown, true);
+        document.addEventListener('keyup', onKeyUp, true);
+      }
     }
 
     public transpose_position_to_screen(canvas_x:number, canvas_y:number): [number, number] {
