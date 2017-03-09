@@ -4,35 +4,198 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="initial-scale=1.0">
-  <title>sample</title>
+
+  <title>Perfect to Index</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="theme-color" content="#ffffff">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script>
+    function submit() {
+      var order_type = document.forms.settings.order_type.value;
+      var param = {
+        "PivotSHV": document.forms.settings.pivot_s_h.value + document.forms.settings.pivot_s_v.value,
+        "PivotZHV": document.forms.settings.pivot_z_h.value + document.forms.settings.pivot_z_v.value,
+        "PivotIHV": document.forms.settings.pivot_i_h.value + document.forms.settings.pivot_i_v.value,
+        "PivotO": document.forms.settings.pivot_o.value,
+        "Field": document.forms.settings.start_field.value,
+        "Order": order_type !== 'Custom' ? order_type : document.forms.settings.order_custom.value,
+        "NextSet": document.forms.settings.next_set.checked ? "1" : "0",
+        "NextPerfect": document.forms.settings.next_perfect.checked ? "1" : "0",
+        "Candidate": document.forms.settings.perfect_candidate.checked ? "1" : "0",
+      };
+
+      var concat = function(k, p) { return k + '&' + p };
+      var data = Object.keys(param).map((key) => {
+        return key + "=" + param[key];
+      }, "").join("&");
+
+      window.open('play.html?' + data, '_blank');
+    }
+  </script>
   <style>
-    canvas {
-      position: fixed;
-      top: 0px;
-      left: 0px;
-      visibility: hidden;
+    body {
+      margin: 10px;
+    }
+
+    label.radio-inline {
+      margin-left: 20px;
+    }
+
+    label.checkbox-inline {
+      margin-left: 20px;
+    }
+
+    img {
+      border: 0;
+    }
+
+    button#start {
+      width: 100%;
     }
   </style>
 </head>
 <body>
-  <canvas id="background" width="375" height="647" style="z-index:10" class="canvas">
-		Your browser does not support HTML5 Canvas.
-	</canvas>
-  <canvas id="background_second" width="375" height="647" style="z-index:10" class="canvas">
-	</canvas>
-  <canvas id="main" width="375" height="647" style="z-index:20" class="canvas">
-	</canvas>
-  <canvas id="main_second" width="375" height="647" style="z-index:20" class="canvas">
-	</canvas>
-  <canvas id="dynamic" width="375" height="647" style="z-index:30" class="canvas">
-	</canvas>
-  <canvas id="dynamic_second" width="375" height="647" style="z-index:30" class="canvas">
-	</canvas>
-  <canvas id="event" width="375" height="647" style="z-index:100" class="canvas">
-	</canvas>
+  <form class="form-horizontal" id="settings">
+    <div class="form-group">
+      <div>
+        タッチ時の回転軸：
+      </div>
+      [ S ]
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_s_h" name="pivot_s_h" value="N" checked> <img src="img/s_normal.png" alt="S Normal">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_s_h" name="pivot_s_h" value="2"> <img src="img/s_reverse.png" alt="S Reverse">
+        </label>
+      </div>
 
-  <div id=debug_text></div>
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_s_v" name="pivot_s_v" value="R"> <img src="img/s_right.png" alt="S Right">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_s_v" name="pivot_s_v" value="L" checked> <img src="img/s_left.png" alt="S Left">
+        </label>
+      </div>
+    </div>
 
-  <script type="text/javascript" src="js/bundle.js"></script>
+    <div class="form-group">
+      [ Z ]
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_z_h" name="pivot_z_h" value="N" checked> <img src="img/z_normal.png" alt="Z Normal">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_z_h" name="pivot_z_h" value="2"> <img src="img/z_reverse.png" alt="Z Reverse">
+        </label>
+      </div>
+
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_z_v" name="pivot_z_v" value="R" checked> <img src="img/z_right.png" alt="Z Right">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_z_v" name="pivot_z_v" value="L"> <img src="img/z_left.png" alt="Z Left">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      [ I ]
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_i_h" name="pivot_i_h" value="N" checked> <img src="img/i_normal.png" alt="I Normal">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_i_h" name="pivot_i_h" value="2"> <img src="img/i_reverse.png" alt="I Reverse">
+        </label>
+      </div>
+
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_i_v" name="pivot_i_v" value="R"> <img src="img/i_right.png" alt="I Right">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_i_v" name="pivot_i_v" value="L" checked> <img src="img/i_left.png" alt="I Left">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      [ O ]
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_o" name="pivot_o" value="N" checked> <img src="img/o_normal.png" alt="O Normal">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_o" name="pivot_o" value="R"> <img src="img/o_right.png" alt="O Right">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_o" name="pivot_o" value="2"> <img src="img/o_reverse.png" alt="O Reverse">
+        </label>
+        <label class="radio-inline">
+          <input type="radio" id="pivot_o" name="pivot_o" value="L"> <img src="img/o_left.png" alt="O Left">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      初期フィールド：
+      <select id="start_field" class="form-control">
+        <option value="Plain">Plain</option>
+        <option value="Perfect">Perfect</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      ミノ順：
+      <div>
+        <label class="radio-inline">
+          <input type="radio" id="order_type" name="order_type" value="Random" checked> Random
+        </label>
+        <label class="radio-inline">
+          <div class="form-inline">
+            <input type="radio" id="order_type" name="order_type" value="Custom"> &nbsp;Custom
+            <input class="form-control" id="order_custom" type="text" placeholder="ex) IOTJLSZILSTZJO">
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      その他:
+      <div>
+        <label class="checkbox-inline">
+          <input type="checkbox" id="next_set"> ミノ1巡ごとにマークをつける
+        </label>
+      </div>
+      <div>
+        <label class="checkbox-inline">
+          <input type="checkbox" id="next_perfect"> ミノ10コごとにマークをつける
+        </label>
+      </div>
+      <div>
+        <label class="checkbox-inline">
+          <input type="checkbox" id="perfect_candidate"> 接着候補を4ラインパーフェクト用にする
+        </label>
+      </div>
+    </div>
+
+  </form>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <button id="start" type="button" class="btn btn-primary" onclick="submit()">Start</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -120,6 +120,22 @@ export namespace steps {
       return this._is_held;
     }
 
+    // TODO: write unittest
+    public get pop_count(): number {
+      return this._pop_count;
+    }
+
+    // TODO: write unittest
+    public get min_count(): number {
+      return this._min_count;
+    }
+
+    // TODO: write unittest
+    public get bag_generator(): () => Type[] {
+      return this._bag_generator;
+    }
+
+    // ホールドからポップされるミノの種類を返す
     public hold(): Type {
       if (this._is_held === true)
         return null;
@@ -137,9 +153,36 @@ export namespace steps {
       return next_type;
     }
 
+    // TODO: write unittest
+    // ホールドからポップされるミノ（もともと最初にツモったミノ）の種類を返す
+    public unhold(): Type {
+      if (this._is_held === false)
+        return null;
+
+      if (this._is_first_held === true) {
+        // 初めてのhold
+        this._types.unshift(this._current);
+        this._current = this._hold;
+        this._hold = null;
+        this._pop_count -= 1;
+      } else {
+        // holdとの交換
+        let temp:Type = this._hold;
+        this._hold = this._current;
+        this._current = temp;
+      }
+
+      // holdを解除
+      this._is_held = false;
+      this._is_first_held = false;
+
+      return this._current;
+    }
+
     public order_history(next_pop_count:number=0): string {
-      if (this._min_count < next_pop_count)
-        next_pop_count = this._min_count;
+      let next_count = this.next_count;
+      if (next_count < next_pop_count)
+        next_pop_count = next_count;
       return this._order_history.slice(0, this._pop_count + next_pop_count);
     }
 
@@ -169,28 +212,11 @@ export namespace steps {
     //　最後に置いたミノを返す
     public undo(): Type {
       // 現在のミノでの復元
-      if (this._is_held === true) {
-        if (this._is_first_held === true) {
-          // 初めてのhold
-          this._types.unshift(this._current);
-          this._current = this._hold;
-          this._hold = null;
-          this._pop_count -= 1;
-        } else {
-          // holdとの交換
-          let temp:Type = this._hold;
-          this._hold = this._current;
-          this._current = temp;
-        }
-      }
+      this.unhold();
 
       // ひとつ前のミノの操作を取得
       let last_operation = this._operations[this._operations.length - 1];
       this._operations = this._operations.slice(0, this._operations.length - 1);
-
-      // holdを解除
-      this._is_held = false;
-      this._is_first_held = false;
 
       // ひとつ前の最初の状況に復元
       if (last_operation === 'v') {

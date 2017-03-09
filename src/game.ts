@@ -150,6 +150,17 @@ export namespace game {
       return true;
     }
 
+    public unhold(): boolean {
+      let current_type = this._steps.unhold();
+      if (current_type === null)
+        return false;
+
+      this._x = this._appear_position[0];
+      this._y = this._appear_position[1];
+      this._mino = mino(current_type);
+      return true;
+    }
+
     public get_next(index:number): Type {
       return this._steps.get_next(index);
     }
@@ -183,6 +194,11 @@ export namespace game {
     }
 
     // TODO: write unittest
+    public get appear_position(): [number, number] {
+      return this._appear_position;
+    }
+
+    // TODO: write unittest
     public get commit_history(): [Type, Rotate, PositionType][] {
       var reg = new RegExp(".{2}", "g");
       var splited = this._commit_history.match(reg);
@@ -192,8 +208,10 @@ export namespace game {
     }
 
     // TODO: write unittest
-    public get order_history(): Type[] {
-      return this._steps.order_history(this._steps.next_count).split('').map((name) => block_by_name(name).type);
+    public get_order_history(next_count?:number): Type[] {
+      if (next_count === undefined)
+        next_count = this._steps.next_count;
+      return this._steps.order_history(next_count).split('').map((name) => block_by_name(name).type);
     }
 
     public freeze(): Game {

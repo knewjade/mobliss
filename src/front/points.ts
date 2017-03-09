@@ -82,6 +82,9 @@ export namespace points {
     const LEFT_TOP:[number, number] = [305, 20];
     const MARGIN_BETWEEN_BOX:number= 15;
 
+    export const POINT_SIZE:number = 8;
+    export const POINT_BIAS:[number, number] = [3, 3];
+
     export function each_box(index:number): [number, number] {
       let diff = (BOX_SIZE + MARGIN_BETWEEN_BOX) * index;
       return [LEFT_TOP[0], LEFT_TOP[1] + diff];
@@ -131,9 +134,9 @@ export namespace points {
   }
 
   export module tetfu {
-    export const BOX_SIZE:number = 30;
+    export const BOX_SIZE:number = 35;
     export const HALF_BOX_SIZE:number = BOX_SIZE / 2.0;
-    export const LEFT_TOP:[number, number] = [305, 350];
+    export const LEFT_TOP:[number, number] = [305, 345];
     export const RIGHT_BOTTOM:[number, number] = [LEFT_TOP[0] + BOX_SIZE, LEFT_TOP[1] + BOX_SIZE];
   }
 }

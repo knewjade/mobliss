@@ -152,7 +152,7 @@ export namespace canvas {
     }
 
     public draw_box(xy:[number, number], size:number, color:string): void {
-      this.draw_rect(xy[0], xy[1], size, size, color);
+      this.fill_rect(xy[0], xy[1], size, size, color);
     }
 
     private draw_rect(x:number, y:number, width:number, height:number, color:string): void {

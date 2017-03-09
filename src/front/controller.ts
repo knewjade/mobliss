@@ -17,6 +17,7 @@ export namespace controller {
   type PositionType = _mino.PositionType;
   type Checkmate = _checkmate.Checkmate;
   type LockSearcher = _lock_searcher.LockSearcher;
+  type LockCandidate = _lock_candidate.LockCandidate;
 
   let Checkmate = _checkmate.Checkmate;
   let LockSearcher = _lock_searcher.LockSearcher;
@@ -34,6 +35,7 @@ export namespace controller {
 
   const FIELD_HEIGHT = points.FIELD_HEIGHT;
   const FIELD_WIDTH = points.FIELD_WIDTH;
+  const NEXT_COUNT = points.NEXT_COUNT;
 
   export enum PerfectStatus {
     NOT_EXECUTE,
@@ -50,8 +52,7 @@ export namespace controller {
     private _stock_games:string[] = [];
     private _perfect_status:PerfectStatus = null;
 
-    constructor(private _game:Game, private _game_generator:() => Game, private _game_recorder:(controller:Controller) => void, private _main_canvas:Canvas, private _dynamic_canvas:Canvas) {
-      let lock_candidate = new LockCandidate();
+    constructor(private _game:Game, private _game_generator:() => Game, private _game_recorder:(controller:Controller) => void, private _is_perfect_lock:boolean, private _is_two_line_perfect:boolean=false, private _main_canvas:Canvas, private _dynamic_canvas:Canvas, lock_candidate:LockCandidate=new LockCandidate()) {
       this._checkmate = new Checkmate(lock_candidate);
 
       this.spawn();
@@ -131,17 +132,37 @@ export namespace controller {
     }
 
     public stock(): void {
+      this.stock_game(this._game);
+    }
+
+    private stock_game(game:Game): void {
       if (MAX_UNDO <= this._stock_games.length)
         this._stock_games.shift();
-      this._stock_games.push(this._game.pack());
+      this._stock_games.push(game.pack());
     }
 
     public undo(): void {
+      // hold済みなら元に戻して終了
+      let is_changed = this._game.unhold();
+      if (is_changed) {
+        this.spawn();
+        this.update_searcher();
+        this.update_all_canvas();
+        return;
+      }
+
+      // ストックがなければ履歴から作成する
+      if (this._stock_games.length === 0) {
+       this.undo_all();
+     }
+
+      // ストックがあれば元に戻す
       if (1 <= this._stock_games.length) {
         let packed = this._stock_games.pop();
         this._game = Game.unpack(packed);
       }
       this._game.respawn();
+      this.spawn();
       this.update_searcher();
       this.update_all_canvas();
     }
@@ -153,14 +174,18 @@ export namespace controller {
     }
 
     public update_searcher(): void {
-      this._searcher = new LockSearcher(this._game.field, this._game.current_mino.type, 4 - (this._game.clear_line_count % 4));
+      let clear_line = this._is_two_line_perfect === true ? this._game.clear_line_count - 2 : this._game.clear_line_count;
+      let lockable_max_y = this._is_perfect_lock ? 4 - (clear_line % 4) : 20;
+      this._searcher = new LockSearcher(this._game.field, this._game.current_mino.type, lockable_max_y);
       this.update_candidates();
     }
 
     public update_candidates(): void {
       let current_mino = this._game.current_mino;
       let rotate = this._checkmate.get_main_rotation(current_mino.type, current_mino.rotate);
-      this._candidates = this._checkmate.get_next_candidates(this._searcher, rotate, 4 - (this._game.clear_line_count % 4));
+      let clear_line = this._is_two_line_perfect === true ? this._game.clear_line_count - 2 : this._game.clear_line_count;
+      let lockable_max_y = this._is_perfect_lock ? 4 - (clear_line % 4) : 20;
+      this._candidates = this._checkmate.get_next_candidates(this._searcher, rotate, lockable_max_y);
       this._perfect_status = PerfectStatus.NOT_EXECUTE;
     }
 
@@ -185,16 +210,38 @@ export namespace controller {
       return this._perfect_status;
     }
 
-    public generate_tetfu_url(): string {
+    private undo_all(): void {
       // まだ一度も置いていないとき
-      if (this._game.steps.order_history(0) === "")
+      if (this._game.steps.pop_count <= 1)
         return;
 
       let commit = this._game.commit_history;
-      let order = this._game.order_history;
+      let order = this._game.get_order_history();
 
-      if (commit == [])
-        return "";
+      let field = create_initial_field(23, FIELD_WIDTH);
+      let steps = new Steps(order, this._game.steps.min_count, this._game.steps.bag_generator);
+      let game = new Game(field, steps, this._game.appear_position);
+      for (let index = 0; index < commit.length - 1; index++) {
+        let c = commit[index];
+        let type = c[0];
+        let rotate = c[1];
+        let x = c[2][0];
+        let y = c[2][1];
+        if (game.current_mino.type !== type)
+          game.hold();
+        game.teleport(x, y, rotate);
+        game.commit();
+        this.stock_game(game);
+      }
+    }
+
+    public generate_tetfu_url(): string {
+      // まだ一度も置いていないとき
+      if (this._game.steps.pop_count <= 1)
+        return undefined;
+
+      let commit = this._game.commit_history;
+      let order = this._game.get_order_history(NEXT_COUNT);
 
       let field = create_initial_field(23, FIELD_WIDTH);
       return encode_with_quiz(field, commit, order);
@@ -206,7 +253,8 @@ export namespace controller {
         let steps = game.steps;
 
         // 残りのブロック数を数える
-        let left_lines = 4 - (game.clear_line_count % 4);
+        let clear_line = this._is_two_line_perfect === true ? this._game.clear_line_count - 2 : this._game.clear_line_count;
+        let left_lines = 4 - (clear_line % 4);
         let left_count = 0;
         for (let y = 0; y < left_lines; y++)
           for (let x = 0; x < field.width; x++)
@@ -233,6 +281,14 @@ export namespace controller {
 
       this._perfect_status = perfect(this._game);
       this._dynamic_canvas.update();
+    }
+
+    public get pop_count():number {
+      return this._game.steps.pop_count;
+    }
+
+    public get is_two_line_perfect():boolean {
+      return this._is_two_line_perfect;
     }
   }
 }

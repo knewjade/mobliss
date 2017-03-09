@@ -31,6 +31,7 @@ gulp.task('build', function(callback) {
     'compile:ts',
     'copy:html',
     'copy:img',
+    'copy:favicons',
     'browserify:js',
     'clean:build.post',
     callback
@@ -64,6 +65,13 @@ gulp.task('copy:img', function(){
   return gulp.src(['img/**/*'])
     .pipe(gulp.dest(OUTPUT_DIRNAME + '/img'));
 });
+
+// Faviconsのコピー
+gulp.task('copy:favicons', function(){
+  return gulp.src(['favicons/*'])
+    .pipe(gulp.dest(OUTPUT_DIRNAME));
+});
+
 
 // テストを実行
 gulp.task('test:spec.js', function(){

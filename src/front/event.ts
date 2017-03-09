@@ -20,20 +20,20 @@ export namespace event {
         return;
 
       // EventListnerに追加
-      if (this._is_mobile === true) {
-        let onClick = (e:TouchEvent) => {
-          // タッチの情報を含むオブジェクト
-          var touchObj = e.changedTouches[0];
+      let onTouch = (e:TouchEvent) => {
+        // タッチの情報を含むオブジェクト
+        var touchObj = e.changedTouches[0];
 
-          let target:HTMLInputElement = <HTMLInputElement> touchObj.target;
-          let rect = target.getBoundingClientRect();
-          let x = touchObj.clientX - rect.left;
-          let y = touchObj.clientY - rect.top;
+        let target:HTMLInputElement = <HTMLInputElement> touchObj.target;
+        let rect = target.getBoundingClientRect();
+        let x = touchObj.clientX - rect.left;
+        let y = touchObj.clientY - rect.top;
 
-          callback(x, y);
-        };
-        this._canvas.addEventListener('touchstart', onClick, true);
-      } else {
+        callback(x, y);
+      };
+      this._canvas.addEventListener('touchend', onTouch, true);
+
+      if (!this._is_mobile) {
         let onClick = (e:MouseEvent) => {
           /*
            * rectでcanvasの絶対座標位置を取得し、
