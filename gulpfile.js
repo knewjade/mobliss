@@ -56,7 +56,7 @@ gulp.task('compile:ts', function(callback){
 
 // HTMLのコピー
 gulp.task('copy:html', function(){
-  return gulp.src(['src/**/*.html'])
+  return gulp.src(['html/**/*.html'])
     .pipe(gulp.dest(OUTPUT_DIRNAME));
 });
 
@@ -72,10 +72,9 @@ gulp.task('copy:favicons', function(){
     .pipe(gulp.dest(OUTPUT_DIRNAME));
 });
 
-
 // テストを実行
 gulp.task('test:spec.js', function(){
-  let targets = OUTPUT_DIRNAME + '/**/*.spec.js';
+  let targets = OUTPUT_DIRNAME + '/**/controller.spec.js';
   // let targets = OUTPUT_DIRNAME + '/**/*.spec.js';
   let node_path = './' + OUTPUT_DIRNAME + '/src/';
   return gulp

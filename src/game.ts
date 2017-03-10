@@ -65,22 +65,28 @@ export namespace game {
       }
     }
 
-    public move_down(): void {
+    public move_down(): boolean {
       if (this._field.checks_empty(this._x, this._y - 1, this._mino.positions)) {
         this._y -= 1;
+        return true;
       }
+      return false;
     }
 
-    public move_left(): void {
+    public move_left(): boolean {
       if (this._field.checks_empty(this._x - 1, this._y, this._mino.positions)) {
         this._x -= 1;
+        return true;
       }
+      return false;
     }
 
-    public move_right(): void {
+    public move_right(): boolean {
       if (this._field.checks_empty(this._x + 1, this._y, this._mino.positions)) {
         this._x += 1;
+        return true;
       }
+      return false;
     }
 
     public move_bottom(): void {

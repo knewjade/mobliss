@@ -607,7 +607,3 @@ namespace main {
     });
   }
 }
-
-window.onload = (event:Event) => {
-  main.onload(event);
-}
