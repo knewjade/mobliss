@@ -76,6 +76,7 @@ namespace main {
       private _game_generator: () => Game;
       private _next_set_flag: boolean = false;
       private _next_perfect_flag: boolean = false;
+      private _candidate_flag:boolean = true;
       private _mobile_flag:boolean = false;
       private _center_flag:boolean = false;
       private _perfect_candidate_flag:boolean = false;
@@ -89,6 +90,8 @@ namespace main {
       }
 
       private parse(): void {
+        console.log(this._params)
+
         this.set_pivot();
         this.set_game_generator();
         this.set_next_set_flag();
@@ -96,28 +99,29 @@ namespace main {
         this.set_mobile_flag();
         this.set_center_flag();
         this.set_perfect_candidate_flag();
+        this.set_candidate_flag();
       }
 
       private set_pivot(): void {
-        let shv = this._params["PivotSHV"];
+        let shv = this._params["ps"];
         if (shv) {
           this.set_main(Type.S, shv[0]);
           this.set_main(Type.S, shv[1]);
         }
 
-        let zhv = this._params["PivotZHV"];
+        let zhv = this._params["pz"];
         if (zhv) {
           this.set_main(Type.Z, zhv[0]);
           this.set_main(Type.Z, zhv[1]);
         }
 
-        let ihv = this._params["PivotIHV"];
+        let ihv = this._params["pi"];
         if (ihv) {
           this.set_main(Type.I, ihv[0]);
           this.set_main(Type.I, ihv[1]);
         }
 
-        let o = this._params["PivotO"];
+        let o = this._params["po"];
         if (o) {
           this.set_main(Type.O, o);
         }
@@ -138,14 +142,16 @@ namespace main {
       private set_game_generator(): void {
         let bag_generator_count = this.get_bag_generator_count();
         let bag_generator = bag_generator_count[0];
-        let field = this._params["Field"];
+        let field = this._params["fld"];
 
         this._one_bag_length = bag_generator_count[1];
 
         if (field === "PerfectRight") {
           this._game_generator = () => {
             let field = create_initial_field(23, FIELD_WIDTH);
-            let steps = new Steps([Type.L, Type.O, Type.J, Type.S, Type.T, Type.Z, Type.I], points.NEXT_COUNT, bag_generator);
+            let steps = new Steps([
+              Type.L, Type.O, Type.J, Type.S, Type.T, Type.Z, Type.I,
+            ], points.NEXT_COUNT, bag_generator);
             let game = new Game(field, steps);
 
             game.teleport(1, 0, Rotate.Normal);
@@ -173,7 +179,7 @@ namespace main {
       }
 
       private get_bag_generator_count(): [() => Type[], number] {
-        let order = this._params["Order"];
+        let order = this._params["ord"];
 
         if (order === "Random") {
           return [null, 7];
@@ -201,12 +207,12 @@ namespace main {
       }
 
       private set_next_set_flag(): void {
-        let next_set = this._params["NextSet"];
+        let next_set = this._params["nset"];
         this._next_set_flag = next_set === "1";
       }
 
       private set_next_perfect_flag(): void {
-        let next_perfect = this._params["NextPerfect"];
+        let next_perfect = this._params["nper"];
         this._next_perfect_flag = next_perfect === "1";
       }
 
@@ -219,8 +225,13 @@ namespace main {
       }
 
       private set_perfect_candidate_flag(): void {
-        let perfect_candidate = this._params["Candidate"];
+        let perfect_candidate = this._params["cper"];
         this._perfect_candidate_flag = perfect_candidate === "1";
+      }
+
+      private set_candidate_flag(): void {
+        let candidate = this._params["cenb"];
+        this._candidate_flag = candidate !== "0";
       }
 
       private is_mobile(): boolean {
@@ -264,6 +275,10 @@ namespace main {
         return this._perfect_candidate_flag;
       }
 
+      public get candidate_flag(): boolean {
+        return this._candidate_flag;
+      }
+
       public get one_bag_length(): number {
         return this._one_bag_length;
       }
@@ -293,24 +308,35 @@ namespace main {
       // ゲームの保存
       let game_recorder = (controller:Controller): void => {
         let two_line = controller.is_two_line_perfect ? "1" : "0";
-        localStorage.setItem(SESSION_GAME_NAME, two_line + controller.game.pack());
+        localStorage.setItem(SESSION_GAME_NAME, "v000@" + two_line + controller.game.pack());
       };
 
       // ゲームの復元
-      let game_session = localStorage.getItem(SESSION_GAME_NAME);
-      // console.log("Session:", SESSION_GAME_NAME, game_session);
+      let game_session:string = localStorage.getItem(SESSION_GAME_NAME) || "";
+      console.log("Session:", SESSION_GAME_NAME, game_session);
+
+      let session_version = game_session.slice(0, 5);
+      if (session_version === 'v000@') {
+        game_session = game_session.slice(5);
+      } else {
+        // バックアップ
+        localStorage.setItem(SESSION_GAME_NAME + ':' + session_version, game_session);
+        game_session = null;
+      }
 
       // メインコントローラの設定
       let game_generator:() => Game = param.game_generator;
       let is_two_line = false;
       let game = null;
       try {
-        is_two_line = game_session !== null && game_session[0] === "1";
-        game = game_session !== null ? Game.unpack(game_session.slice(1)) : game_generator();
+        is_two_line = game_session !== "" && game_session[0] === "1";
+        game = game_session !== "" ? Game.unpack(game_session.slice(1)) : game_generator();
       } catch (e) {
         game = game_generator();
       }
-      let controller = new Controller(game, game_generator, game_recorder, param.perfect_candidate_flag, is_two_line, main, dynamic, param.lock_candidate);
+      let controller = new Controller(
+        game, game_generator, game_recorder, param.perfect_candidate_flag, is_two_line, param.candidate_flag, main, dynamic, param.lock_candidate
+      );
 
       // タッチイベントのセットアップ
       event.setup_click_event(this.invoke_click_callback(event, controller));
@@ -413,13 +439,16 @@ namespace main {
         let pop_count = controller.pop_count;
         let half_box_size = points.next.HALF_BOX_SIZE;
         for (let index = 0; index < points.NEXT_COUNT; index++) {
+          // 1巡ごとにマークをつける
           if (next_set_flag === true && (pop_count + index) % one_bag_length === 0) {
             let bias = points.next.POINT_BIAS;
             let box = points.next.each_box(index);
             canvas.draw_box([box[0] + bias[0], box[1] + bias[1]], points.next.POINT_SIZE, "rgb(226, 4, 27)");
           }
 
-          if (next_perfect_flag === true && (pop_count + index) % 10 === 0) {
+          // パーフェクト1巡ごとにマークをつける
+          let bias = controller.is_two_line_perfect === true ? 5 : 0;
+          if (next_perfect_flag === true && (pop_count + index + bias) % 10 === 0) {
             let box_size = points.next.BOX_SIZE;
             let box = points.next.each_box(index);
             let point_bias = points.next.POINT_BIAS;

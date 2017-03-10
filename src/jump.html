@@ -3,7 +3,7 @@
   <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="initial-scale=1.0">
+  <meta name="viewport" content="width=550">
 
   <title>Jump to tetfu</title>
 
@@ -40,7 +40,7 @@
         var a = document.createElement("a");
         a.href = targets[target] + param;
         a.target = "_top";
-        a.style.fontSize = "x-large";
+        a.style.fontSize = "xx-large";
         a.style.color = "#ffffff";
         a.innerHTML = '<span class="bg-primary">[' + target + ']</span>';
 
@@ -49,7 +49,7 @@
       }
 
       var frame = document.getElementById("tetfu");
-      frame.width = window.innerWidth;
+      frame.width = 550;
       frame.height = window.innerHeight;
       frame.src = targets["List"] + param;
     };

@@ -52,7 +52,7 @@ export namespace controller {
     private _stock_games:string[] = [];
     private _perfect_status:PerfectStatus = null;
 
-    constructor(private _game:Game, private _game_generator:() => Game, private _game_recorder:(controller:Controller) => void, private _is_perfect_lock:boolean, private _is_two_line_perfect:boolean=false, private _main_canvas:Canvas, private _dynamic_canvas:Canvas, lock_candidate:LockCandidate=new LockCandidate()) {
+    constructor(private _game:Game, private _game_generator:() => Game, private _game_recorder:(controller:Controller) => void, private _is_perfect_lock:boolean, private _is_two_line_perfect:boolean=false, private _is_candidate:boolean, private _main_canvas:Canvas, private _dynamic_canvas:Canvas, lock_candidate:LockCandidate=new LockCandidate()) {
       this._checkmate = new Checkmate(lock_candidate);
 
       this.spawn();
@@ -126,7 +126,12 @@ export namespace controller {
     }
 
     public commit(): void {
-      this._game.commit();
+      let game = this._game;
+      game.commit();
+
+      if (game.field.is_perfect == true)
+        this._is_two_line_perfect = game.clear_line_count % 10 !== 0;
+
       this.spawn();
       this._game_recorder(this);
     }
@@ -181,11 +186,13 @@ export namespace controller {
     }
 
     public update_candidates(): void {
-      let current_mino = this._game.current_mino;
-      let rotate = this._checkmate.get_main_rotation(current_mino.type, current_mino.rotate);
-      let clear_line = this._is_two_line_perfect === true ? this._game.clear_line_count - 2 : this._game.clear_line_count;
-      let lockable_max_y = this._is_perfect_lock ? 4 - (clear_line % 4) : 20;
-      this._candidates = this._checkmate.get_next_candidates(this._searcher, rotate, lockable_max_y);
+      if (this._is_candidate === true) {
+        let current_mino = this._game.current_mino;
+        let rotate = this._checkmate.get_main_rotation(current_mino.type, current_mino.rotate);
+        let clear_line = this._is_two_line_perfect === true ? this._game.clear_line_count - 2 : this._game.clear_line_count;
+        let lockable_max_y = this._is_perfect_lock ? 4 - (clear_line % 4) : 20;
+        this._candidates = this._checkmate.get_next_candidates(this._searcher, rotate, lockable_max_y);
+      }
       this._perfect_status = PerfectStatus.NOT_EXECUTE;
     }
 
@@ -221,7 +228,8 @@ export namespace controller {
       let field = create_initial_field(23, FIELD_WIDTH);
       let steps = new Steps(order, this._game.steps.min_count, this._game.steps.bag_generator);
       let game = new Game(field, steps, this._game.appear_position);
-      for (let index = 0; index < commit.length - 1; index++) {
+      let max = commit.length - 1;
+      for (let index = 0; index < max; index++) {
         let c = commit[index];
         let type = c[0];
         let rotate = c[1];
@@ -231,7 +239,8 @@ export namespace controller {
           game.hold();
         game.teleport(x, y, rotate);
         game.commit();
-        this.stock_game(game);
+        if(max - MAX_UNDO <= index)
+          this.stock_game(game);
       }
     }
 
