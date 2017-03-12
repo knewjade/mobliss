@@ -1,0 +1,13 @@
+canvas {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  visibility: hidden;
+}
+
+div#debug_text {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  visibility: visible;
+}

@@ -24,7 +24,10 @@ export namespace controller {
   let create_initial_field = _field.create_initial_field
   let encode_with_quiz = _tetfu.encode_with_quiz;
 
-  type ControllerFlags = {
+  export type GameGenerator = () => Game;
+  export type OperationCallbackType = (event_name:string, controller:Controller) => void;
+
+  export type ControllerFlags = {
     max_undo_count:number,    // 保持する最大UNDO個数（同一Game内であればこの最大値によらずにUNDOできる）
     visible_field_height:number,    // 表示上のフィールドの縦のサイズ
     visible_field_width:number,    // 表示上のフィールドの横のサイズ
@@ -32,8 +35,9 @@ export namespace controller {
     is_candidate:boolean,   // 接着候補の表示
     is_perfect_candidate:boolean,    // 接着候補をパフェ用にする
     is_two_line_perfect:boolean,   // 2ラインパフェによる目標削除ラインを修正する
-    game_generator:() => Game,
-    operation_callback:(event_name:string, controller:Controller) => void,   // 操作後に呼ばれるcallback
+    game_generator:GameGenerator,
+    bag_length:number,  // Bag1順のミノ数
+    operation_callback:OperationCallbackType,   // 操作後に呼ばれるcallback
   };
 
   export enum PerfectStatus {
@@ -42,6 +46,17 @@ export namespace controller {
     NotFound,
     NotFoundYet,
     Stopped,
+  }
+
+  function pack(is_two_line_perfect:boolean, game:Game): string {
+    let two_line_perfect = is_two_line_perfect ? "1" : "0";
+    return two_line_perfect + game.pack();
+  }
+
+  function unpack(packed:string): [boolean, Game] {
+    let is_two_line_perfect = packed[0] === "1";
+    let game = Game.unpack(packed.slice(1));
+    return [is_two_line_perfect, game];
   }
 
   export class Controller {
@@ -76,11 +91,15 @@ export namespace controller {
       if (flags.is_perfect_candidate === false)
         return 20;
       // 候補をパーフェクト用にする場合
-      else if (this._flags.is_two_line_perfect === false)
-        return 4 - (this._game.clear_line_count % 4);
-      // 候補をパーフェクト用にするが、2ラインパーフェクトを奇数回しているとき
       else
-        return 4 - ((this._game.clear_line_count + 2) % 4);
+        return this.get_max_y_for_perfect(this._game.clear_line_count, this._flags.is_two_line_perfect);
+    }
+
+    private get_max_y_for_perfect(clear_line_count:number, is_two_line_perfect:boolean): number {
+      if (is_two_line_perfect === false)
+        return 4 - (clear_line_count % 4);
+      else
+        return 4 - ((clear_line_count + 2) % 4);
     }
 
     private update_candidates(): void {
@@ -168,15 +187,15 @@ export namespace controller {
     }
 
     private stock(): void {
-      this.stock_game(this._game);
+      this.stock_game(this._flags.is_two_line_perfect, this._game);
     }
 
-    private stock_game(game:Game): void {
+    private stock_game(is_two_line_perfect:boolean, game:Game): void {
       let flags = this._flags;
 
       if (flags.max_undo_count <= this._stock_games.length)
         this._stock_games.shift();
-      this._stock_games.push(game.pack());
+      this._stock_games.push(pack(is_two_line_perfect, game));
     }
 
     private commit(): void {
@@ -196,13 +215,15 @@ export namespace controller {
       this._flags.operation_callback('commit', this);
     }
 
+    // TODO: write unittest: restartしたら2lineパフェの記録が消えることを確認
     public restart(): void {
       let flags = this._flags;
+
       this.stock();
       this._game = flags.game_generator();
       this.update_searcher();
       this.spawn();
-      this._flags.operation_callback('commit', this);
+      flags.operation_callback('commit', this);
     }
 
     public generate_tetfu(): string {
@@ -219,6 +240,10 @@ export namespace controller {
     }
 
     public check_perfect(): void {
+      // 実行済みならスキップする
+      if (this._perfect_status !== PerfectStatus.NotExecute)
+        return;
+
       let perfect_function = (game:Game, max_y:number): PerfectStatus => {
         let field = game.field;
         let steps = game.steps;
@@ -255,18 +280,20 @@ export namespace controller {
         return PerfectStatus.Stopped;
       };
 
-      let max_y = this.get_max_y_for_candidate();
+      let max_y = this.get_max_y_for_perfect(this._game.clear_line_count, this._flags.is_two_line_perfect);
       this._perfect_status = perfect_function(this._game, max_y);
       this._flags.operation_callback('perfect', this);
     }
 
     public undo(): void {
+      let flags = this._flags;
+
       // hold済みなら元に戻して終了
       let is_changed = this._game.unhold();
       if (is_changed) {
         this.spawn();
         this.update_searcher();
-        this._flags.operation_callback('commit', this);
+        flags.operation_callback('commit', this);
         return;
       }
 
@@ -278,13 +305,16 @@ export namespace controller {
       // ストックがあれば元に戻す
       if (1 <= this._stock_games.length) {
         let packed = this._stock_games.pop();
-        this._game = Game.unpack(packed);
+        let unpacked = unpack(packed);
+        flags.is_two_line_perfect = unpacked[0];
+        this._game = unpacked[1];
       }
       this.spawn();
       this.update_searcher();
-      this._flags.operation_callback('commit', this);
+      flags.operation_callback('commit', this);
     }
 
+    // TODO: write unittest: undoしたら2lineパフェの記録が戻ることを確認
     private undo_all(): void {
       // まだ一度も置いていないとき
       if (this._game.steps.pop_count <= 1)
@@ -302,10 +332,11 @@ export namespace controller {
       // 実際の操作を再現
       let commits_length = commits.length - 1;
       let max_undo_count = this._flags.max_undo_count;
+      let is_two_line_perfect = false;
       for (let index = 0; index < commits_length; index++) {
         // Undo記録対象の範囲なら記録
         if (commits_length - max_undo_count - 1<= index)
-          this.stock_game(game);
+          this.stock_game(is_two_line_perfect, game);
 
         let commit = commits[index];
         let type = commit[0];
@@ -320,10 +351,19 @@ export namespace controller {
         // 実際に置く
         game.teleport(x, y, rotate);
         game.commit();
+
+        // パーフェクトしたとき clear line % 4 が 2 なら、2ラインパフェフラグをたてる
+        if (game.field.is_perfect == true)
+          is_two_line_perfect = game.clear_line_count % 4 === 2;
       }
 
       // 最後の状態を記録
-      this.stock_game(game);
+      this.stock_game(is_two_line_perfect, game);
+    }
+
+    // TODO: write unittest
+    public pack(): string {
+      return pack(this._flags.is_two_line_perfect, this._game);
     }
 
     public get game(): Game {
@@ -336,6 +376,30 @@ export namespace controller {
 
     public get perfect_status(): PerfectStatus {
       return this._perfect_status;
+    }
+
+    // TODO: write unittest
+    public get pop_count(): number {
+      return this._game.steps.pop_count;
+    }
+
+    // TODO: write unittest
+    public is_top_in_bag(next_index:number): boolean {
+      let bag_length = this._flags.bag_length;
+      return (this.pop_count + next_index) % bag_length === 0;
+    }
+
+    // TODO: write unittest
+    public is_top_in_perfect_cycle(next_index:number): boolean {
+      let cycle_top_count = this._flags.is_two_line_perfect === true ? 5 : 0;
+      return (this.pop_count + next_index) % 10 === cycle_top_count;
+    }
+
+    // TODO: write unittest
+    static unpack(packed:string, lock_candidate:LockCandidate, flags:ControllerFlags): Controller {
+      let unpacked = unpack(packed);
+      flags.is_two_line_perfect = unpacked[0];
+      return new Controller(unpacked[1], lock_candidate, flags);
     }
   }
 }

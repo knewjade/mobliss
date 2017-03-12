@@ -9,6 +9,8 @@ export namespace canvas {
     }
   }
 
+  export type DrawEventFunc = (canvas:Canvas) => void;
+
   export class Canvas {
     private _canvases:HTMLCanvasElement[] = [];
     private _visible_canvas_index:number = 0;
@@ -16,7 +18,7 @@ export namespace canvas {
     private _drawing_context:CanvasRenderingContext2D;
     private _left_top: [number, number];
     private _scale: number;
-    private _draw_events: ((canvas:Canvas) => void)[] = [];
+    private _draw_events: (DrawEventFunc)[] = [];
     private _update_counter:number = 0;
 
     constructor(id:string, private _canvas_size:[number, number], private _screen_size:[number, number], private _is_centering:boolean, private _is_double_buffring:boolean=true) {
@@ -69,11 +71,11 @@ export namespace canvas {
       return <HTMLCanvasElement> document.getElementById(id);
     }
 
-    public add_draw_event(draw_event:(canvas:Canvas) => void) {
+    public add_draw_event(draw_event:DrawEventFunc) {
       this._draw_events.push(draw_event);
     }
 
-    public add_draw_events(draw_events:((canvas:Canvas) => void)[]) {
+    public add_draw_events(draw_events:(DrawEventFunc)[]) {
       this._draw_events = this._draw_events.concat(draw_events);
     }
 
@@ -82,7 +84,7 @@ export namespace canvas {
       return canvas.wrap_draw_event((canvas:Canvas) => canvas.clear())(obj)
     }
 
-    private wrap_draw_event(event:(canvas:Canvas) => void): (obj:[Canvas, number]) => Promise<[Canvas, number]> {
+    private wrap_draw_event(event:DrawEventFunc): (obj:[Canvas, number]) => Promise<[Canvas, number]> {
       return (obj:[Canvas, number]) => {
         let canvas = obj[0];
         let counter = obj[1];

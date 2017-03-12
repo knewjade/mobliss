@@ -5,6 +5,8 @@ export namespace steps {
 
   let Type = _mino.Type;
 
+  export type BagGenerator = () => Type[];
+
   let name_by_type = _mino.name_by_type;
   let block_by_name = _mino.block_by_name;
 
@@ -48,7 +50,7 @@ export namespace steps {
     private _operations:string = "";
     private _pop_count:number = 0;
 
-    constructor(types:Type[], private _min_count:number=1, private _bag_generator:() => Type[]=null) {
+    constructor(types:Type[], private _min_count:number=1, private _bag_generator:BagGenerator=null) {
       if (this._bag_generator === null)
         this._bag_generator = create_random_bag;
       this.push_to_next(types);
@@ -131,7 +133,7 @@ export namespace steps {
     }
 
     // TODO: write unittest
-    public get bag_generator(): () => Type[] {
+    public get bag_generator(): BagGenerator {
       return this._bag_generator;
     }
 
@@ -267,7 +269,7 @@ export namespace steps {
     }
 
     // 接着ミノ順と復元後のStepsインスタンスを返却
-    static unpack(packed:string, bag_generator:() => Type[]=create_random_bag): Steps {
+    static unpack(packed:string, bag_generator:BagGenerator=create_random_bag): Steps {
       let split = packed.split(',');
       let order_history = split[0];
       let operations = split[1];

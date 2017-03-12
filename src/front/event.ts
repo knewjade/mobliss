@@ -5,13 +5,13 @@ export namespace event {
 
   let Canvas = _canvas.Canvas;
 
-  const MAX_DAS:number = 80;
-  const DAS_DELAY:number = 40;
-
   export class EventController {
     private _canvas:Canvas;
 
-    constructor(id:string, canvas_size:[number, number], screen_size:[number, number], is_centering:boolean, private _is_mobile:boolean) {
+    constructor(
+      id:string, canvas_size:[number, number], screen_size:[number, number], is_centering:boolean, private _is_mobile:boolean, private _is_keyboard_enable:boolean,
+      private _das_target_keys:string[], private _max_das:number, private _das_delay:number
+    ) {
       this._canvas = new Canvas(id, canvas_size, screen_size, is_centering, false);
     }
 
@@ -53,16 +53,17 @@ export namespace event {
     }
 
     public setup_keydown_event(callback:(name:string) => void): void {
-      let das_target_names:{ [name:string]: any } = {
-        'ArrowLeft': null,
-        'ArrowRight': null,
-        'ArrowDown': null,
-      };
-
-      if (!callback)
+      if (this._is_keyboard_enable === false || !callback)
         return;
 
+      let das_target_names:{ [name:string]: any } = {};
+      for (let key of this._das_target_keys)
+        das_target_names[key] = null;
+
       let key_status: { [type: string]:[number, number, boolean] } = {};
+
+      let max_das = this._max_das;
+      let das_delay = this._das_delay;
 
       // キーを押したとき
       function onKeyDown(e:KeyboardEvent) {
@@ -73,7 +74,7 @@ export namespace event {
 
         // DAS対応かチェックする
         if (key in das_target_names) {
-          onDASKeyDown(key);
+          onDASKeyDown(key, max_das, das_delay);
         } else {
           if (key_status[key][0] === key_status[key][1]) {
             callback(key);
@@ -83,7 +84,7 @@ export namespace event {
       }
 
       // DAS対応のキーを押したとき
-      function onDASKeyDown(key:string): void {
+      function onDASKeyDown(key:string, max_das:number, das_delay:number): void {
         // キーイベントの連続発火防止
         if (key_status[key][0] !== key_status[key][1])
           return;
@@ -91,7 +92,7 @@ export namespace event {
         // 新しいDAS入力の開始
         key_status[key][0] += 1;
         key_status[key][2] = false;
-        setTimeout(check_das, MAX_DAS, key, key_status[key][0]);  //millisec
+        setTimeout(check_das, max_das, key, key_status[key][0], das_delay);  //millisec
       }
 
       // キーが上がったとき
@@ -112,7 +113,7 @@ export namespace event {
       }
 
       // DAS中の操作
-      function check_das(key:string, prev_counter:number): void {
+      function check_das(key:string, prev_counter:number, das_delay:number): void {
         // すでにキーが離されているか、一度キーが離されている
         if (key_status[key][0] === key_status[key][1] || key_status[key][0] !== prev_counter)
           return;
@@ -120,7 +121,7 @@ export namespace event {
         // DASの発動
         callback(key);
 
-        setTimeout(check_das, DAS_DELAY, key, prev_counter);  //millisec
+        setTimeout(check_das, das_delay, key, prev_counter, das_delay);  //millisec
       }
 
       // EventListnerに追加

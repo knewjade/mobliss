@@ -1,64 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang=ja>
   <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- <meta name="viewport" content="width=550"> -->
+  <meta name="viewport" content="width=550, initial-scale=1, shrink-to-fit=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=550">
 
-  <title>Jump to tetfu</title>
+  <meta name="theme-color" content="#ffffff">
+
+  <title>mobliss jump</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="./css/jump.css">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
   <link rel="manifest" href="/manifest.json">
   <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-  <meta name="theme-color" content="#ffffff">
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   <script>
-    window.onload = function() {
-      var param = location.search.substr(2);
-      var div = document.getElementById("link");
+  <!--
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-      if (param.slice(0, 4) !== "115@") {
-        document.body.innerHTML = 'parameter error';
-        return;
-      }
-
-      var link_div = document.getElementById("link");
-
-      var targets = {
-        'Edit': "http://fumen.zui.jp/?v",
-        'List': "http://fumen.zui.jp/?d",
-        'View': "http://fumen.zui.jp/?m",
-      };
-
-      for (var target in targets) {
-        var div = document.createElement("div");
-        div.className = "col-xs-3 col-sm-3 col-md-2 col-lg-2";
-
-        var a = document.createElement("a");
-        a.href = targets[target] + param;
-        a.target = "_top";
-        a.style.fontSize = "xx-large";
-        a.style.color = "#ffffff";
-        a.innerHTML = '<span class="bg-primary">[' + target + ']</span>';
-
-        div.appendChild(a);
-        link_div.appendChild(div);
-      }
-
-      var frame = document.getElementById("tetfu");
-      frame.width = 550;
-      frame.height = window.innerHeight;
-      frame.src = targets["List"] + param;
-    };
+    ga('create', 'UA-93540402-1', 'auto');
+    ga('send', 'pageview');
+  -->
   </script>
-  <style>
-    body {
-      margin: 10px;
-    }
-  </style>
 </head>
 <body>
   <div>
@@ -78,5 +50,12 @@
   </div>
 
   <script type="text/javascript" src="js/bundle.js"></script>
+  <script>
+    <!--
+    window.onload = function (event) {
+      window.entry_point.jump(event);
+    }
+    -->
+  </script>
 </body>
 </html>

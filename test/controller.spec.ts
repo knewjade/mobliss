@@ -46,7 +46,7 @@ describe("Controller", () => {
     };
   };
 
-  it("appear x:4, y:19", () => {
+  it("should appear x:4, y:19", () => {
     let game_generator = default_game_generator([Type.I, Type.J, Type.O, Type.T, Type.L, Type.Z, Type.S, Type.T, Type.O, Type.S, Type.Z]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -58,6 +58,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -98,7 +99,7 @@ describe("Controller", () => {
     expect(controller.game.y).to.equal(19);
   });
 
-  it("operate from button", () => {
+  it("should operate from button", () => {
     let game_generator = default_game_generator([Type.I, Type.J, Type.O, Type.T, Type.L, Type.Z, Type.S, Type.T, Type.O, Type.S, Type.Z]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -110,6 +111,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -181,7 +183,7 @@ describe("Controller", () => {
     expect(controller.game.field.is_perfect).to.be.true;
   });
 
-  it("restart", () => {
+  it("should restart", () => {
     let game_generator = default_game_generator();
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -193,6 +195,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -209,7 +212,7 @@ describe("Controller", () => {
     expect(controller.game.field.is_perfect).to.be.true;
   });
 
-  it("operate from directly", () => {
+  it("should operate from directly", () => {
     let game_generator = default_game_generator([Type.T, Type.J]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -221,6 +224,7 @@ describe("Controller", () => {
       is_candidate: true,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -246,7 +250,7 @@ describe("Controller", () => {
     ]);
   });
 
-  it("not put without candidates", () => {
+  it("should not put without candidates", () => {
     let game_generator = default_game_generator();
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -258,6 +262,7 @@ describe("Controller", () => {
       is_candidate: true,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -270,7 +275,7 @@ describe("Controller", () => {
     expect(controller.game.field.is_perfect).to.be.true;
   });
 
-  it("not put when 'is_candidate' is false", () => {
+  it("should not put when 'is_candidate' is false", () => {
     let game_generator = default_game_generator();
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -282,6 +287,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -294,7 +300,7 @@ describe("Controller", () => {
     expect(controller.game.field.is_perfect).to.be.true;
   });
 
-  it("candidate 4 line after 2 line perfect", () => {
+  it("should candidate 4 line after 2 line perfect", () => {
     let game_generator = default_game_generator([Type.O, Type.O, Type.J, Type.I, Type.L, Type.I]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -306,6 +312,7 @@ describe("Controller", () => {
       is_candidate: true,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -325,7 +332,7 @@ describe("Controller", () => {
     ]);
   });
 
-  it("undo", () => {
+  it("should undo", () => {
     let game_generator = default_game_generator([Type.I, Type.O]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -337,6 +344,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -375,7 +383,7 @@ describe("Controller", () => {
     }
   });
 
-  it("undo with multi games", () => {
+  it("should undo with multi games", () => {
     let game_generator = default_game_generator([Type.I, Type.O]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -387,6 +395,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -418,7 +427,7 @@ describe("Controller", () => {
     }
   });
 
-  it("generate tetfu", () => {
+  it("should generate tetfu", () => {
     let game_generator = default_game_generator([Type.I, Type.O, Type.S, Type.Z, Type.J, Type.L, Type.T]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -430,6 +439,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {},
     });
@@ -445,7 +455,7 @@ describe("Controller", () => {
     expect(controller.generate_tetfu()).to.equal(expected_tetfu);
   });
 
-  it("check perfect 1: Stopped", (done) => {
+  it("should check perfect 1: Stopped", (done) => {
     let game_generator = default_game_generator([Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -457,6 +467,7 @@ describe("Controller", () => {
       is_candidate: false,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {
         if (event_name === 'perfect') {
@@ -478,7 +489,7 @@ describe("Controller", () => {
     controller.check_perfect();
   });
 
-  it("check perfect 2: Found", (done) => {
+  it("should check perfect 2: Found", (done) => {
     let game_generator = default_game_generator([Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.T, Type.I]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -488,8 +499,9 @@ describe("Controller", () => {
       visible_field_width: 10,
       next_count: 5,
       is_candidate: true,
-      is_perfect_candidate: true,
+      is_perfect_candidate: false,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {
         if (event_name === 'perfect') {
@@ -521,7 +533,7 @@ describe("Controller", () => {
     controller.check_perfect();
   });
 
-  it("check perfect 3: Found [hold]", (done) => {
+  it("should check perfect 3: Found [hold]", (done) => {
     let game_generator = default_game_generator([Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I]);
     let game = game_generator();
     let lock_candidate = new LockCandidate();
@@ -533,6 +545,7 @@ describe("Controller", () => {
       is_candidate: true,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {
         if (event_name === 'perfect') {
@@ -565,7 +578,7 @@ describe("Controller", () => {
     controller.check_perfect();
   });
 
-  it("check perfect 4: NotFound", function (done) {
+  it("should check perfect 4: NotFound", function (done) {
     this.timeout(5000);
 
     let game_generator = default_game_generator([Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I]);
@@ -579,6 +592,7 @@ describe("Controller", () => {
       is_candidate: true,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 7,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {
         if (event_name === 'perfect') {
@@ -609,7 +623,7 @@ describe("Controller", () => {
     controller.check_perfect();
   });
 
-  it("check perfect 5: NotFoundYet", function (done) {
+  it("should check perfect 5: NotFoundYet", function (done) {
     this.timeout(20000);
 
     let game_generator = default_game_generator([Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I, Type.I]);
@@ -623,6 +637,7 @@ describe("Controller", () => {
       is_candidate: true,
       is_perfect_candidate: true,
       is_two_line_perfect: false,
+      bag_length: 1,
       game_generator: game_generator,
       operation_callback: (event_name:string, controller:Controller) => {
         if (event_name === 'perfect') {

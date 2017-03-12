@@ -1,0 +1,19 @@
+body {
+  margin: 10px;
+}
+
+label.radio-inline {
+  margin-left: 20px;
+}
+
+label.checkbox-inline {
+  margin-left: 20px;
+}
+
+img {
+  border: 0;
+}
+
+button#start {
+  width: 100%;
+}
