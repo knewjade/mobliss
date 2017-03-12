@@ -193,7 +193,8 @@ export namespace params {
 
   export enum FieldType {
     Empty,
-    PerfectRight,
+    PerfectTRight,
+    PerfectTLeft,
   }
 
   namespace map {
@@ -226,7 +227,8 @@ export namespace params {
 
     let to_field_type_map:{ [value:string]: FieldType } = {
       'Empty': FieldType.Empty,
-      'PerfectRight': FieldType.PerfectRight,
+      'PerfectTRight': FieldType.PerfectTRight,
+      'PerfectTLeft': FieldType.PerfectTLeft,
     };
 
     let from_field_type_map:{ [type:number]: string } = {};

@@ -18,8 +18,6 @@ gulp.task('test', function(callback) {
   runsequence(
     'clean:output',
     'compile:ts',
-    'copy:html',
-    'copy:img',
     'test:spec.js',
     callback
   );
@@ -30,6 +28,7 @@ gulp.task('build', function(callback) {
     'clean:output',
     'compile:ts',
     'copy:html',
+    'copy:css',
     'copy:img',
     'copy:favicons',
     'browserify:js',
@@ -60,6 +59,12 @@ gulp.task('copy:html', function(){
     .pipe(gulp.dest(OUTPUT_DIRNAME));
 });
 
+// CSSのコピー
+gulp.task('copy:css', function(){
+  return gulp.src(['css/**/*'])
+    .pipe(gulp.dest(OUTPUT_DIRNAME + '/css'));
+});
+
 // Imageのコピー
 gulp.task('copy:img', function(){
   return gulp.src(['img/**/*'])
@@ -74,8 +79,8 @@ gulp.task('copy:favicons', function(){
 
 // テストを実行
 gulp.task('test:spec.js', function(){
-  let targets = OUTPUT_DIRNAME + '/**/controller.spec.js';
-  // let targets = OUTPUT_DIRNAME + '/**/*.spec.js';
+  // let targets = OUTPUT_DIRNAME + '/**/params.spec.js';
+  let targets = OUTPUT_DIRNAME + '/**/*.spec.js';
   let node_path = './' + OUTPUT_DIRNAME + '/src/';
   return gulp
     .src(targets, {read: false})
@@ -86,7 +91,7 @@ gulp.task('test:spec.js', function(){
 // browserifyの実行
 gulp.task('browserify:js', function(){
   return browserify({
-      entries: [OUTPUT_DIRNAME + '/src/main.js'],
+      entries: [OUTPUT_DIRNAME + '/src/front/entry.js'],
       paths: [OUTPUT_DIRNAME + '/src'],
     })
     .bundle()

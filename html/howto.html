@@ -8,7 +8,7 @@
 
   <meta name="theme-color" content="#ffffff">
 
-  <title>mobliss error</title>
+  <title>how to mobliss</title>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   <link rel="stylesheet" href="./css/howto.css">
@@ -31,84 +31,262 @@
   -->
   </script>
 </head>
-<body data-spy="scroll" data-target="#navbar-example">
-  <div id="navbar-example">
-    <ul class="nav nav-tabs" role="tablist">
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-    </ul>
-    <ul class="nav nav-tabs" role="tablist">
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-      test <br>
-    </ul>
-  </div>
-</body>
-  <!-- <h1>目次</h1>
-  <p>
+<body>
+  <nav>
+    <h2>目次</h2>
     <ul>
+      <li><a href='#abstract'>概要</a></li>
       <li><a href='#play'>プレイ画面</a></li>
-      <li><a href='#test'>second</a></li>
+      <li><a href='#settings'>設定項目</a></li>
+      <li><a href='#recommends'>オススメ環境</a></li>
+      <li><a href='#special_thanks'>スペシャルサンクス</a></li>
+      <li><a href='/index.html'>ホームに戻る</a></li>
     </ul>
-  </p>
+  </nav>
 
-  <h1 id='play'>プレイ画面</h1>
-  <a href="img/howto/play.png"><img class="img-thumbnail" src="img/howto/play.png" alt="play"></a>
-  <p>
-    <h3>① フィールド画面</h3>
+  <section class='top' id='abstract'>
+    <h2>概要</h2>
 
-    説明
+    このゲームでは、スマートフォン操作に対応した練習・研究を目的としてます。<br>
+    現在、さらに中でもパーフェクトに特化しています。<br>
 
-    <h3>① フィールド画面</h3>
+    このゲームが持っている特徴的な機能は、次の通りです。
 
-    説明
+    <ul>
+      <li>回転と接着候補選択を組み合わせたスマートフォン操作</li>
+      <li>Undo機能</li>
+      <li>ワンボタンでリスタート</li>
+      <li>0G（重力なし）</li>
+      <li>ページロード時、前回の状態へ復帰</li>
+      <li>パーフェクト確定の判定</li>
+      <li>練習サポート／地形選択・マークの表示</li>
+      <li><a href="http://fumen.zui.jp">テト譜</a>の出力</li>
+    </ul>
 
-  </p> -->
+    <strong>ゲームの設定値はURLに保存されているので、一度設定したあとにブックマークしておくとすぐに再開できます。</strong>
+  </section>
+
+  <section class='top' id='play'>
+    <h2>プレイ画面</h2>
+
+    <figure>
+      <figurecaption class="d-block">スクリーンショット ↓</figurecaption>
+      <a href="img/howto/play.png"><img class="img-thumbnail large-img" src="img/howto/play.png" alt="play"></a>
+    </figure>
+
+    <article>
+      <h5>1. フィールド</h5>
+      <div class='description'>
+        このフィールドはページを開いたときに、自動的に復元されます。<br>
+        <img id='candidate' src="img/candidate.png" alt="candidate">は次に接着できる位置の候補です。<br>
+        候補をクリック／タップすると、そこを回転軸としてミノを接着させます。<br>
+        なお、表示上は同じだが回転軸が異なるOやSZIは、現在の向きによらず事前に設定した回転軸に従って表示されます。<br>
+      </div>
+
+      <h5>2. ネクスト</h5>
+      <h5>3. ホールド</h5>
+      <h5>4. 左回転・右回転</h5>
+      <h5>5. リスタート</h5>
+      <div class='description'>
+        新しいゲームがスタートします。地形やミノ順は、設定によって決まります。
+      </div>
+
+      <h5>6. Undo</h5>
+      <h5>7. パーフェクトチェック</h5>
+      <div class='description'>
+        表示されているネクストの範囲で4ラインのパーフェクトができるかを判定します。<br>
+        クライアント上で判定を行うので、<strong>残りのミノ数によっては時間がかかりますが、その間操作はしないようにしてください（特にスマートフォン）。</strong><br>
+        判定後、結果によって以下の通りにボタンの色が変化します。
+        <ul>
+          <li>緑: 「パーフェクト可能」で確定</li>
+          <li>赤: 「パーフェクト不可」で確定</li>
+          <li>黄: 現段階で「パーフェクト不可」（ネクストより先のツモに依存する）</li>
+          <li>黒: 判定不可（パーフェクトまでに7ミノ以上必要とする）</li>
+        </ul>
+      </div>
+
+      <h5>8. <a href="http://fumen.zui.jp">テト譜</a>を出力</h5>
+    </article>
+  </section>
+
+  <section class='top' id='settings'>
+    <h2>設定項目</h2>
+
+    <article>
+      <h5>キーボード</h5>
+      <div class='description'>
+        キーボード操作関連の設定を行います。<br>
+
+        <ul>
+          <li>DAS: 移動溜め時間。ミリ秒。キーを押してから連続移動を開始するまでの時間（横移動と下移動に影響を与えます）</li>
+          <li>ARR: 連続移動間隔。ミリ秒。連続移動時、移動と移動の間隔に対する時間（横移動と下移動に影響を与えます）</li>
+        </ul>
+
+        DASとARRは、Javascriptで制御している関係上、過度な期待はしないでください。<br>
+        各キーバインドには、JavascriptのKey Valuesを指定してください。
+        <a href='https://developer.mozilla.org/ja/docs/Web/API/KeyboardEvent/key/Key_Values'>リファレンス:MDN - Key Values</a><br>
+        （リファレンスは英語ですが、表の最左列を指定すればだいたい大丈夫です）<br>
+
+        <br>
+
+        ※ Key Valuesの仕様よりスペースキーを指定するとき、テキストボックスが「 」となるのでご注意ください。
+      </div>
+    </article>
+
+    <article>
+      <h5>接着表示（クリック／タップ用）</h5>
+      <div class='description'>
+        クリック／タップによる操作のための接着候補関連の設定を行います。<br>
+        接着候補を表示するときに使用する回転軸を指定します。<br>
+        ゲーム中に表示される接着候補は、ゲーム内での回転方向によらず、ここで選択された回転軸に固定されて表示されます。<br>
+      </div>
+    </article>
+
+    <article>
+      <h5>初期地形</h5>
+      <div class='description'>
+        スタート時の地形を設定します。
+        <ul>
+          <li>Empty: ブロックがない通常時の地形</li>
+          <li>Perfect T-Right: Tを右回転で立てたパーフェクトテンプレ（Iミノスタート）</li>
+          <li>Perfect T-Left: Tを左回転で立てたパーフェクトテンプレ（Iミノスタート）</li>
+        </ul>
+      </div>
+    </article>
+
+    <article>
+      <h5>ミノ順</h5>
+      <div class='description'>
+        ミノの順番を設定します。<br>
+        ここでは、カスタムしたミノ順に固定することもできます。<br>
+        カスタムしたミノ順に制約は特にありません。そのため、「7文字である」「7種すべてを使う」必要はありません。<br>
+        空白や存在しないミノを指定した場合は、強制的にDefaultとなります。
+
+        <ul>
+          <li>Default: デフォルト（ランダムな7種1順）</li>
+          <li>Custom: 固定したミノ順を文字列で指定できます。 ex) 「SZOILJT」「SZ」「I」「IOT」「TOOL」</li>
+        </ul>
+      </div>
+    </article>
+
+    <article>
+      <h5>その他</h5>
+      <div class='description'>
+        表示上などを設定します。<br>
+        ネクストの表示個数の最大は5です。<br>
+
+        <br>
+
+        各マークは、該当するネクストに対して表示されます。<br>
+        <ul>
+          <li>左上の赤マーク: ミノ1巡の最初のミノ</li>
+          <li>右上の緑マーク: パーフェクトサイクル（ミノ10個セット）の最初のミノ</li>
+        </ul>
+
+        <figure>
+          <figurecaption class="d-block">マーク ↓</figurecaption>
+          <a href="img/howto/mark.png"><img id="mark" class="img-thumbnail" src="img/howto/mark.png" alt="mark"></a>
+        </figure>
+
+        ミノ1巡とは、ミノ順がDefaultのとき、7種類1セットとして最初に出現するミノを指します。<br>
+        もし、ミノ順をカスタムしているときは、それを1セットとして最初に出現するミノを指します。（「SZ」で 指定した場合、2つごとにでてくるSにマークがつきます）<br>
+
+        <br>
+
+        パーフェクトサイクルは、順当に置いていったときに必要となるミノ10個のサイクルを指します。<br>
+        ただし、2ラインパーフェクトをしたとき、その瞬間にサイクルがリセットされ、そこから10個ごとにマークがつきます。<br>
+        このマークがついているミノは、ホールドを利用したとき最後に置くことができるミノに対応します。
+
+        <br>
+
+        接着候補を4ラインパーフェクト用にすると、接着候補に下位4ライン内に収まる候補しか表示されなくなります。<br>
+        ラインを削除すると接着可能な範囲は、その分少なくなっていきます。<br>
+        パーフェクトするごとに接着可能な範囲がリセットされます。
+      </div>
+    </article>
+  </section>
+
+  <section class='top' id='recommends'>
+    <h2>オススメ環境</h2>
+
+    <article>
+      <h5>ブックマーク</h5>
+      ゲーム画面をブックマークして、すぐにプレイ再開できるようにします。<br>
+
+      <br>
+
+      手順：
+      <ol>
+        <li>任意のブラウザを起動して、<a href="/index.html">設定画面</a>を開く</li>
+        <li>各種設定を行う</li>
+        <li>「Start」して<a href="/play.html">ゲーム画面</a>に移動する</li>
+        <li>ブラウザでブックマークする</li>
+        <li>次のプレイ時はゲーム画面をブックマークから開く</li>
+      </ol>
+    </article>
+
+    <article>
+      <h5>Vivaldi WEBパネル</h5>
+
+      <a href="https://vivaldi.com">ブラウザにVivaldi</a>を使うと次のようにプレイできます。<br>
+      必要がないときは画面を横にしまうことができるので、プレイがしやすいです。<br>
+
+      <figure>
+        <figurecaption class="d-block">作者の環境 ↓</figurecaption>
+        <a href="img/howto/vivaldi.png"><img id="vivaldi" class="img-thumbnail" src="img/howto/vivaldi.png" alt="vivaldi"></a>
+      </figure>
+
+      手順：
+      <ol>
+        <li>Vivaldiを起動して、<a href="/index.html">設定画面</a>を開く</li>
+        <li>各種設定を行う</li>
+        <li>「Start」して<a href="/play.html">ゲーム画面</a>に移動する</li>
+        <li>VivaldiのWEBパネルに追加する</li>
+        <li>次のプレイ時はWEBパネルを開く</li>
+      </ol>
+
+      WEBパネルの操作方法は外部サイトを参照してください。（一例：<a href="http://utaukitune.ldblog.jp/archives/65892459.html">歌うキツネ - Vivaldi のWEBパネルの使い方</a>）
+    </article>
+
+    <article>
+      <h5>iPhone/iPad ホーム画面に追加</h5>
+
+      iOSの場合、ホーム画面に追加することで、アプリのようにプレイすることができます。<br>
+      全画面で操作できるため、ブラウザでの操作よりこちらをオススメします。
+
+      （Andoroidの場合はわかりません。もしご存知の方はぜひご教示お願いします。）
+
+      <figure>
+        <figurecaption class="d-block">スクリーンショット ↓</figurecaption>
+        <a href="img/howto/ios_home.png"><img class="img-thumbnail large-img" src="img/howto/ios_home.png" alt="ios home"></a>
+        <a href="img/howto/ios_play.png"><img class="img-thumbnail large-img" src="img/howto/ios_play.png" alt="ios play"></a>
+      </figure>
+
+      手順：
+      <ol>
+        <li>iOS Safariを起動して、<a href="/index.html">設定画面</a>を開く</li>
+        <li>各種設定を行う</li>
+        <li>「Start」して<a href="/play.html">ゲーム画面</a>に移動する</li>
+        <li>「ホーム画面に追加する」をタップ</li>
+        <li>必要があれば名前をつけて「追加」をタップ</li>
+        <li>iOSのホーム画面からゲームを起動する</li>
+      </ol>
+
+      「ホーム画面に追加する」方法は外部サイトを参照してください。（一例：<a href="http://www.ipodwave.com/iphone/howto/website_home.html">iPhone Wave - iPhoneの「Safari」でWebサイトをホーム画面に追加する</a>）
+    </article>
+  </section>
+
+  <section class='top' id='special_thanks'>
+    <h2>スペシャルサンクス</h2>
+
+    素材として利用させていただきました。
+
+    <h6><a href="http://fumen.zui.jp">連続テト譜エディタ</a></h6>
+    <h6><a href="http://www.pixiv.net/member_illust.php?mode=medium&illust_id=2255890">pixiv - テトリスの素材 by 白銀ゆう</a></h6>
+  </section>
+
+  <footer>
+    <a href='/index.html'>ホームに戻る</a>
+  </footer>
 </body>
 </html>

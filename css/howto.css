@@ -1,14 +1,41 @@
 body {
   margin: 10px;
 }
-/*}
-body {
-  position: relative;
-}*/
-/*p {
-  margin-left: 20px;
+
+img.large-img {
+  height: 250px;
+  margin: 10px;
 }
 
-div#description {
+img#candidate {
+  width: 20px;
+  margin: 2px;
+}
+
+img#vivaldi {
+  width: 70%;
+  margin: 10px;
+}
+
+img#mark {
+  width: 70px;
+  margin: 2px;
+}
+
+section.top, footer {
+  border-top-style : solid;
+  border-width : 1px;
+  border-color : #bbbbbb;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+article {
   margin-left: 20px;
-}*/
+  margin-bottom: 20px;
+}
+
+div.description {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}

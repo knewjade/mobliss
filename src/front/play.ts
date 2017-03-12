@@ -189,7 +189,7 @@ export namespace play {
           let steps = new Steps([], next_count, bag_generator);
           return new Game(field, steps);
         };
-      } else if (field_type === FieldType.PerfectRight) {
+      } else if (field_type === FieldType.PerfectTRight) {
         return () => {
           let field = create_initial_field(23, FIELD_WIDTH);
           let steps = new Steps([
@@ -208,6 +208,29 @@ export namespace play {
           game.teleport(3, 1, Rotate.Right);
           game.commit();
           game.teleport(4, 2, Rotate.Normal);
+          game.commit();
+
+          return game;
+        };
+      } else if (field_type === FieldType.PerfectTLeft) {
+        return () => {
+          let field = create_initial_field(23, FIELD_WIDTH);
+          let steps = new Steps([
+            Type.L, Type.O, Type.J, Type.Z, Type.T, Type.S, Type.I,
+          ], next_count, bag_generator);
+          let game = new Game(field, steps);
+
+          game.teleport(8, 0, Rotate.Normal);
+          game.commit();
+          game.teleport(7, 1, Rotate.Normal);
+          game.commit();
+          game.teleport(8, 3, Rotate.Reverse);
+          game.commit();
+          game.teleport(4, 0, Rotate.Normal);
+          game.commit();
+          game.teleport(6, 1, Rotate.Left);
+          game.commit();
+          game.teleport(5, 2, Rotate.Normal);
           game.commit();
 
           return game;
