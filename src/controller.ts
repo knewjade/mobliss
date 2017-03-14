@@ -266,8 +266,9 @@ export namespace controller {
           // 探索
           let lock_candidate = new LockCandidate();
           let checkmate = new Checkmate(lock_candidate);
-          let order = [game.current_mino.type].concat(steps.next_types);
+          let order = [game.current_mino.type].concat(steps.get_next_types(next_count));
           let max_mino_count = Math.floor(left_blocks / 4);
+
           let result = checkmate.search_perfect(field, order, game.hold_type, max_mino_count, max_y, steps.is_held);
 
           // 結果

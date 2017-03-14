@@ -41,7 +41,7 @@ describe("Controller", () => {
   let default_game_generator = (types:Type[]=[]) => {
     return () => {
       let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
-      let steps = new Steps(types, 1);
+      let steps = new Steps(types, 5);
       return new Game(field, steps);
     };
   };
@@ -428,7 +428,11 @@ describe("Controller", () => {
   });
 
   it("should generate tetfu", () => {
-    let game_generator = default_game_generator([Type.I, Type.O, Type.S, Type.Z, Type.J, Type.L, Type.T]);
+    let game_generator = () => {
+      let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
+      let steps = new Steps([Type.I, Type.O, Type.S, Type.Z, Type.J, Type.L, Type.T], 1);
+      return new Game(field, steps);
+    };
     let game = game_generator();
     let lock_candidate = new LockCandidate();
     let controller = new Controller(game, lock_candidate, {
@@ -529,6 +533,8 @@ describe("Controller", () => {
 
     controller.rotate_right();
     controller.put(3, 1);
+
+    controller.hold();
 
     controller.check_perfect();
   });
@@ -664,6 +670,98 @@ describe("Controller", () => {
     controller.put(2, 0);
 
     controller.put(3, 1);
+
+    controller.check_perfect();
+  });
+
+  it("should check perfect 6: NotFoundYet", function (done) {
+    this.timeout(120000);
+
+    let game_generator = default_game_generator([Type.T, Type.J, Type.Z, Type.L, Type.O, Type.J, Type.S, Type.O, Type.J, Type.S, Type.Z]);
+    let game = game_generator();
+    let lock_candidate = new LockCandidate();
+    let controller = new Controller(game, lock_candidate, {
+      max_undo_count: 10,
+      visible_field_height: 20,
+      visible_field_width: 10,
+      next_count: 5,
+      is_candidate: true,
+      is_perfect_candidate: true,
+      is_two_line_perfect: false,
+      bag_length: 1,
+      game_generator: game_generator,
+      operation_callback: (event_name:string, controller:Controller) => {
+        if (event_name === 'perfect') {
+          // 実行後に結果が反映されている
+          expect(controller.perfect_status).to.equal(PerfectStatus.NotFoundYet);
+
+          controller.hold();
+
+          // // 実行後に操作すると結果が消える
+          expect(controller.perfect_status).to.equal(PerfectStatus.NotExecute);
+
+          done();
+        }
+      },
+    });
+
+    expect(controller.perfect_status).to.equal(PerfectStatus.NotExecute);
+
+    controller.hold();
+
+    controller.put(1, 0);
+
+    controller.put(3, 0);
+
+    controller.rotate_left();
+    controller.put(4, 2);
+
+    controller.check_perfect();
+  });
+
+  it("should check perfect 7: Found", function (done) {
+    this.timeout(20000);
+
+    let game_generator = default_game_generator([Type.T, Type.J, Type.Z, Type.L, Type.O, Type.J, Type.S, Type.O, Type.J, Type.S, Type.Z]);
+    let game = game_generator();
+    let lock_candidate = new LockCandidate();
+    let controller = new Controller(game, lock_candidate, {
+      max_undo_count: 10,
+      visible_field_height: 20,
+      visible_field_width: 10,
+      next_count: 5,
+      is_candidate: true,
+      is_perfect_candidate: true,
+      is_two_line_perfect: false,
+      bag_length: 1,
+      game_generator: game_generator,
+      operation_callback: (event_name:string, controller:Controller) => {
+        if (event_name === 'perfect') {
+          // 実行後に結果が反映されている
+          expect(controller.perfect_status).to.equal(PerfectStatus.Found);
+
+          controller.hold();
+
+          // // 実行後に操作すると結果が消える
+          expect(controller.perfect_status).to.equal(PerfectStatus.NotExecute);
+
+          done();
+        }
+      },
+    });
+
+    expect(controller.perfect_status).to.equal(PerfectStatus.NotExecute);
+
+    controller.hold();
+
+    controller.put(1, 0);
+
+    controller.put(3, 0);
+
+    controller.rotate_left();
+    controller.put(4, 2);
+
+    controller.put(8, 0);
 
     controller.check_perfect();
   });

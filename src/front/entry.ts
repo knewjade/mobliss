@@ -268,9 +268,9 @@ namespace entry {
       }
 
       var frame:HTMLFrameElement = <HTMLFrameElement>document.getElementById("tetfu");
-      frame.width = 550;
-      frame.height = window.innerHeight;
       frame.src = targets["List"] + param;
+      frame.width = 550;
+      frame.width = frame.scrollHeight;
     }
   }
 

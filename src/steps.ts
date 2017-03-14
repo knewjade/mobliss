@@ -92,12 +92,21 @@ export namespace steps {
       this._types = this._types.concat(types);
     }
 
-    public get_next(index:number): Type {
+    public get_next_type(index:number): Type {
       if (this._min_count <= index)
         return undefined;
 
       this.fill();
       return this._types[index];
+    }
+
+    // TODO: write unittest
+    public get_next_types(count:number): Type[] {
+      if (this._min_count < count)
+        return undefined;
+      
+      this.fill();
+      return this._types.slice(0, count);
     }
 
     public get next_count(): number {

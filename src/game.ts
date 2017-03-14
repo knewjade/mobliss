@@ -168,7 +168,7 @@ export namespace game {
     }
 
     public get_next(index:number): Type {
-      return this._steps.get_next(index);
+      return this._steps.get_next_type(index);
     }
 
     public get x(): number {

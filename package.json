@@ -6,7 +6,8 @@
   "scripts": {
     "build": "gulp build",
     "test": "gulp test",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "deploy": "gulp deploy"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +22,7 @@
     "gulp-mocha": "^3.0.1",
     "gulp-plumber": "^1.1.0",
     "gulp-preprocess": "^2.0.0",
+    "gulp-shell": "^0.6.3",
     "gulp-spawn-mocha": "^3.1.0",
     "gulp-typescript": "^3.1.4",
     "istanbul": "^0.4.5",

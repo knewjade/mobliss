@@ -33,9 +33,9 @@ describe("Steps", () => {
     let steps = new Steps([], 6, generator);
 
     for (let index = 0; index < 6; index++)
-      expect(steps.get_next(index)).to.equal(ALL_TYPES[index + 1]);
+      expect(steps.get_next_type(index)).to.equal(ALL_TYPES[index + 1]);
 
-    expect(steps.get_next(6)).to.be.undefined;
+    expect(steps.get_next_type(6)).to.be.undefined;
   });
 
   it("should decide mino order by generator", () => {
