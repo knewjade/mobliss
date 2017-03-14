@@ -36,7 +36,7 @@ export namespace controller {
     is_perfect_candidate:boolean,    // 接着候補をパフェ用にする
     is_two_line_perfect:boolean,   // 2ラインパフェによる目標削除ラインを修正する
     game_generator:GameGenerator,
-    bag_length:number,  // Bag1順のミノ数
+    bag_length:number,  // Bag 1巡分のミノ数
     operation_callback:OperationCallbackType,   // 操作後に呼ばれるcallback
   };
 
@@ -244,6 +244,7 @@ export namespace controller {
       if (this._perfect_status !== PerfectStatus.NotExecute)
         return;
 
+      let next_count = this._flags.next_count;
       let perfect_function = (game:Game, max_y:number): PerfectStatus => {
         let field = game.field;
         let steps = game.steps;
@@ -261,7 +262,7 @@ export namespace controller {
           return PerfectStatus.Stopped;
 
         // 条件を満たしていたら探索する
-        if (left_blocks <= 24 || (left_blocks === 28 && hold_type !== null)) {
+        if (left_blocks <= 4 * (next_count + 1) || (left_blocks === 4 * (next_count + 2) && hold_type !== null)) {
           // 探索
           let lock_candidate = new LockCandidate();
           let checkmate = new Checkmate(lock_candidate);
@@ -272,7 +273,7 @@ export namespace controller {
           // 結果
           if (result === true)
             return PerfectStatus.Found;
-          else if (left_blocks === 28 && hold_type !== null)
+          else if (left_blocks === 4 * (next_count + 2) && hold_type !== null)
             return PerfectStatus.NotFoundYet;   // 現状パフェはできない。ただし、次のミノがみえないため、ツモ次第で結果が変わる可能性がある
           else
             return PerfectStatus.NotFound;

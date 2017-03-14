@@ -1,19 +1,11 @@
-body {
-  margin: 10px;
+section.category, footer {
+  border-top-style : solid;
+  border-width : 1px;
+  border-color : #bbbbbb;
+  margin-top: 20px;
+  padding-top: 20px;
 }
 
-label.radio-inline {
-  margin-left: 20px;
-}
-
-label.checkbox-inline {
-  margin-left: 20px;
-}
-
-img {
-  border: 0;
-}
-
-button#start {
-  width: 100%;
+input {
+  margin-left: 0px;
 }

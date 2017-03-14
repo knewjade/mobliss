@@ -49,7 +49,7 @@ namespace entry {
       return (params:any):boolean => params[param_name];
     };
     let get_integer = (param_name:string):ToFormFuncType => {
-      return (params:any):string => params[param_name].toString();
+      return (params:any):number => params[param_name];
     };
 
     // valueの型: 代入先のフォームの型
@@ -66,7 +66,7 @@ namespace entry {
       return (params:any, value:boolean):void => { params[param_name] = value; };
     };
     let set_integer = (param_name:string):ToParamFuncType => {
-      return (params:any, value:string):void => { params[param_name] = Params.parse_to_integer(value); };
+      return (params:any, value:number):void => { params[param_name] = value; };
     };
 
     // フォーム化の定義
@@ -179,9 +179,9 @@ namespace entry {
         if (define.type === FormType.Checkbox)
           property_name = 'checked';
 
-        if (key === 'NextCount') {
-          console.log(params)
-        }
+        // console.log(key);
+        // if (key !== 'OrderType')
+        //   console.log(document.forms.settings[define.form_name][property_name]);
 
         // 実際に反映させる
         if (define.type === FormType.Custom) {
@@ -226,10 +226,10 @@ namespace entry {
         }
       }
 
-      console.log(params.text);
-
       let text = params.text;
       localStorage.setItem(SESSION_PARAMS_NAME, text);
+      console.log(text);
+
       window.open('play.html?' + text, '_blank');
     }
   }

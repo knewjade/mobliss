@@ -33,213 +33,338 @@
   </script>
 </head>
 <body>
-  <p>
-    <a href='howto.html'>How toはこちら</a>
-  </p>
-
-  <form class="form-horizontal" id="settings">
-    <div class="form-group">
-      <h2>キーボード：</h2>
-      <div>
-        <label class="checkbox-inline">
-          <input type="checkbox" id="keyboard_enable" checked> キーボード操作を有効にする
-        </label>
-        <label class="form-inline">
-          DAS： <input class="form-control" id="max_das" type="text" placeholder="ex) 80" value="80">
-        </label>
-        <label class="form-inline">
-          ARR <input class="form-control" id="das_delay" type="text" placeholder="ex) 40" value="40">
-        </label>
-      </div>
-
-      <h2>キーバインド：</h2>
-      <div>
-        <h4>移動：</h4>
-        <div>
-          <label class="form-inline">
-            右移動： <input class="form-control" id="move_right" type="text" placeholder="ex) ArrowRight" value="ArrowRight">
-          </label>
-          <label class="form-inline">
-            左移動： <input class="form-control" id="move_left" type="text" placeholder="ex) ArrowLeft" value="ArrowLeft">
-          </label>
-          <label class="form-inline">
-            ソフトドロップ（下移動）： <input class="form-control" id="move_down" type="text" placeholder="ex) ArrowDown" value="ArrowDown">
-          </label>
-          <label class="form-inline">
-            ハードドロップ： <input class="form-control" id="harddrop" type="text" placeholder="ex)  （半角スペース）" value=" ">
-          </label>
-        </div>
-
-        <h4>回転・ホールド：</h4>
-        <div>
-          <label class="form-inline">
-            右回転： <input class="form-control" id="rotate_right" type="text" placeholder="ex) x" value="x">
-          </label>
-          <label class="form-inline">
-            左回転： <input class="form-control" id="rotate_left" type="text" placeholder="ex) z" value="z">
-          </label>
-          <label class="form-inline">
-            ホールド： <input class="form-control" id="hold" type="text" placeholder="ex) c" value="c">
-          </label>
-        </div>
-
-        <h4>ヘルパー：</h4>
-        <div>
-          <label class="form-inline">
-            リスタート <input class="form-control" id="restart" type="text" placeholder="ex) r" value="r">
-          </label>
-          <label class="form-inline">
-            Undo： <input class="form-control" id="undo" type="text" placeholder="ex) q" value="q">
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <h2>接着表示（クリック／タップ用）：</h2>
-      <div>
-        <label class="checkbox-inline">
-          <input type="checkbox" id="candidate_visible" checked> 接着候補を表示する
-        </label>
-      </div>
-
-      <h4>回転軸：<h4>
-      [ S ]
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_s_h" name="pivot_s_h" value="N" checked> <img src="img/s_normal.png" alt="S Normal">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_s_h" name="pivot_s_h" value="2"> <img src="img/s_reverse.png" alt="S Reverse">
-        </label>
-      </div>
-
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_s_v" name="pivot_s_v" value="R"> <img src="img/s_right.png" alt="S Right">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_s_v" name="pivot_s_v" value="L" checked> <img src="img/s_left.png" alt="S Left">
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      [ Z ]
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_z_h" name="pivot_z_h" value="N" checked> <img src="img/z_normal.png" alt="Z Normal">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_z_h" name="pivot_z_h" value="2"> <img src="img/z_reverse.png" alt="Z Reverse">
-        </label>
-      </div>
-
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_z_v" name="pivot_z_v" value="R" checked> <img src="img/z_right.png" alt="Z Right">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_z_v" name="pivot_z_v" value="L"> <img src="img/z_left.png" alt="Z Left">
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      [ I ]
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_i_h" name="pivot_i_h" value="N" checked> <img src="img/i_normal.png" alt="I Normal">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_i_h" name="pivot_i_h" value="2"> <img src="img/i_reverse.png" alt="I Reverse">
-        </label>
-      </div>
-
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_i_v" name="pivot_i_v" value="R"> <img src="img/i_right.png" alt="I Right">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_i_v" name="pivot_i_v" value="L" checked> <img src="img/i_left.png" alt="I Left">
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      [ O ]
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_o" name="pivot_o" value="N" checked> <img src="img/o_normal.png" alt="O Normal">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_o" name="pivot_o" value="R"> <img src="img/o_right.png" alt="O Right">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_o" name="pivot_o" value="2"> <img src="img/o_reverse.png" alt="O Reverse">
-        </label>
-        <label class="radio-inline">
-          <input type="radio" id="pivot_o" name="pivot_o" value="L"> <img src="img/o_left.png" alt="O Left">
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <h4>初期地形：</h4>
-      <select id="field_type" class="form-control">
-        <option value="Empty" selected="">Empty</option>
-        <option value="PerfectTRight">Perfect T-Right</option>
-        <option value="PerfectTLeft">Perfect T-Left</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <h4>ミノ順：</h4>
-      <div>
-        <label class="radio-inline">
-          <input type="radio" id="order_type" name="order_type" value="Default" checked> Default
-        </label>
-        <label class="radio-inline">
-          <div class="form-inline">
-            <input type="radio" id="order_type" name="order_type" value="Custom"> &nbsp;Custom
-            <input class="form-control" id="custom_order" type="text" placeholder="ex) IOTJLSZILSTZJO">
-          </div>
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <h4>その他：</h4>
-      <div>
-        <label class="form-inline">
-          ネクストの表示個数： <input class="form-control" id="next_count" type="text" placeholder="0 <= value <= 5" value="5">
-        </label>
-      </div>
-      <div>
-        <label class="checkbox-inline">
-          <input type="checkbox" id="bag_mark"> ミノ1巡ごとにマークをつける
-        </label>
-      </div>
-      <div>
-        <label class="checkbox-inline">
-          <input type="checkbox" id="perfect_mark"> ミノ10コごとにマークをつける
-        </label>
-      </div>
-      <div>
-        <label class="checkbox-inline">
-          <input type="checkbox" id="candidate_limit_perfect"> 接着候補を4ラインパーフェクト用にする
-        </label>
-      </div>
-    </div>
-
-  </form>
-
   <div class="container">
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <button id="start" type="button" class="btn btn-primary" onclick="submit()">Start</button>
+    <section>
+      <a href='howto.html'>How toはこちら</a>
+    </section>
+
+    <section><form id="settings">
+      <section class='category'>
+        <label class='category-header'>
+          <h2>キーボード</h2>
+        </label>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="keyboard_enable" checked> キーボード操作を有効にする
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-inline">
+            DAS： <input class="form-control" id="max_das" type="number" placeholder="ex) 80" min="0" value="80">
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-inline">
+            ARR： <input class="form-control" id="das_delay" type="number" placeholder="ex) 40" min="0" value="40">
+          </label>
+        </div>
+
+        <section>
+          <label>
+            <h3>キーバインド</h3>
+          </label>
+
+          <section>
+            <label>
+              <h4>移動</h4>
+            </label>
+
+            <div class="form-group">
+              <label class="form-inline">
+              右移動： <input class="form-control" id="move_right" type="text" placeholder="ex) ArrowRight" value="ArrowRight">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-inline">
+              左移動： <input class="form-control" id="move_left" type="text" placeholder="ex) ArrowLeft" value="ArrowLeft">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-inline">
+              ソフトドロップ（下移動）： <input class="form-control" id="move_down" type="text" placeholder="ex) ArrowDown" value="ArrowDown">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-inline">
+              ハードドロップ： <input class="form-control" id="harddrop" type="text" placeholder="ex)  （半角スペース）" value=" ">
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <label>
+              <h4>回転・ホールド</h4>
+            </label>
+
+            <div class="form-group">
+              <label class="form-inline">
+                右回転： <input class="form-control" id="rotate_right" type="text" placeholder="ex) x" value="x">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-inline">
+                左回転： <input class="form-control" id="rotate_left" type="text" placeholder="ex) z" value="z">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-inline">
+                ホールド： <input class="form-control" id="hold" type="text" placeholder="ex) c" value="c">
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <label>
+              <h4>ヘルパー</h4>
+            </label>
+
+            <div class="form-group">
+              <label class="form-inline">
+                リスタート <input class="form-control" id="restart" type="text" placeholder="ex) r" value="r">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-inline">
+                Undo： <input class="form-control" id="undo" type="text" placeholder="ex) q" value="q">
+              </label>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <section class='category'>
+        <label class='category-header'>
+          <h2>接着表示（クリック／タップ用）</h2>
+        </label>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="candidate_visible" checked> 接着候補を表示する
+          </label>
+        </div>
+
+        <section>
+          <label>
+            <h3>回転軸</h3>
+          </label>
+
+          <section>
+            <label>
+              <h4>[ S ]</h4>
+            </label>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_s_h" id="pivot_s_h" value="N" checked> <img src="img/s_normal.png" alt="S Normal">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_s_h" id="pivot_s_h" value="2"> <img src="img/s_reverse.png" alt="S Reverse">
+                </label>
+              </div>
+            </section>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_s_v" id="pivot_s_v" value="L" checked> <img src="img/s_left.png" alt="S Left">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_s_v" id="pivot_s_v" value="R"> <img src="img/s_right.png" alt="S Right">
+                </label>
+              </div>
+            </section>
+          </section>
+
+          <section>
+            <label>
+              <h4>[ Z ]</h4>
+            </label>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_z_h" id="pivot_z_h" value="N" checked> <img src="img/z_normal.png" alt="Z Normal">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_z_h" id="pivot_z_h" value="2"> <img src="img/z_reverse.png" alt="Z Reverse">
+                </label>
+              </div>
+            </section>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_z_v" id="pivot_z_v" value="L"> <img src="img/z_left.png" alt="Z Left">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_z_v" id="pivot_z_v" value="R" checked> <img src="img/z_right.png" alt="Z Right">
+                </label>
+              </div>
+            </section>
+          </section>
+
+          <section>
+            <label>
+              <h4>[ I ]</h4>
+            </label>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_i_h" id="pivot_i_h" value="N" checked> <img src="img/i_normal.png" alt="I Normal">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_i_h" id="pivot_i_h" value="2"> <img src="img/i_reverse.png" alt="I Reverse">
+                </label>
+              </div>
+            </section>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_i_v" id="pivot_i_v" value="L" checked> <img src="img/i_left.png" alt="I Left">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_i_v" id="pivot_i_v" value="R"> <img src="img/i_right.png" alt="I Right">
+                </label>
+              </div>
+            </section>
+          </section>
+
+          <section>
+            <label>
+              <h4>[ O ]</h4>
+            </label>
+
+            <section>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_o" id="pivot_o" value="N" checked> <img src="img/o_normal.png" alt="O Normal">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_o" id="pivot_o" value="2"> <img src="img/o_right.png" alt="O Right">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_o" id="pivot_o" value="L"> <img src="img/o_reverse.png" alt="O Reverse">
+                </label>
+              </div>
+
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="pivot_o" id="pivot_o" value="R"> <img src="img/o_left.png" alt="O Left">
+                </label>
+              </div>
+          </section>
+        </section>
+      </section>
+
+      <section class='category'>
+        <label class='category-header'>
+          <h2>初期地形</h2>
+        </label>
+
+        <select id="field_type" class="form-control">
+          <option value="Empty" selected="">Empty</option>
+          <option value="PerfectTRight">Perfect T-Right</option>
+          <option value="PerfectTLeft">Perfect T-Left</option>
+        </select>
+      </section>
+
+      <section class='category'>
+        <label class='category-header'>
+          <h2>ミノ順</h2>
+        </label>
+
+        <section>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="order_type" id="order_type" value="Default" checked> Default
+            </label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="order_type" id="order_type" value="Default" checked> Custom
+            </label>
+            <label class="form-check-label">
+              <input class="form-control" id="custom_order" type="text" placeholder="ex) IOTJLSZILSTZJO">
+            </label>
+          </div>
+        </section>
+      </section>
+
+      <section class='category'>
+        <label class='category-header'>
+          <h2>その他</h2>
+        </label>
+
+        <div class="form-group">
+          <label class="form-inline">
+            ネクストの表示個数： <input class="form-control" id="next_count" type="number" placeholder="ex) 5" min="0" max="5" value="5">
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="bag_mark"> ミノ1巡の先頭ミノにマークをつける
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="perfect_mark"> パーフェクトサイクルの先頭ミノにマークをつける
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="candidate_limit_perfect"> 接着候補を4ラインパーフェクト用にする
+          </label>
+        </div>
+      </section>
+    </form></section>
+
+    <footer>
+      <div class="form-group row">
+        <div class="col-12">
+          <button id="start" type="button" class="btn btn-primary" onclick="submit()" style='width: 100%;'>Start</button>
+        </div>
       </div>
-    </div>
+    </footer>
   </div>
 
   <script type="text/javascript" src="js/bundle.js"></script>
