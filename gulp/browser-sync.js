@@ -9,7 +9,7 @@ gulp.task('server', function(){
   browsersync.create()
     .init({
       server: {
-        baseDir: 'OUTPUT_DIRNAME'
+        baseDir: OUTPUT_DIRNAME
       },
       files: [OUTPUT_DIRNAME + '/*']
     });

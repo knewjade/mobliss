@@ -58,7 +58,7 @@ describe("Game", () => {
     expect(game.y).to.equal(20);
   });
 
-  it("should operate", () => {
+  it("should operate 1", () => {
     let field = create_initial_field(FIELD_HEIGHT, FIELD_WIDTH);
     let steps = new Steps([Type.I, Type.S, Type.T, Type.Z, Type.L, Type.O, Type.J], 1);
     let game = new Game(field, steps);
@@ -90,6 +90,87 @@ describe("Game", () => {
       20, 21, 22, 23, 24, 27, 28, 29,
       30, 31, 32, 33, 37, 38, 39
     ]);
+  });
+
+  it("should operate 2", () => {
+    let field = _field.create_gray_field(23, 10, [
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]);
+
+    let steps = new Steps([Type.I, Type.I, Type.I, Type.I, Type.I], 1);
+    let game = new Game(field, steps, [4, 20]);
+
+    // Type I
+    game.move_left();
+    game.move_left();
+    game.move_left();
+    game.rotate_right();
+    game.move_left();
+    game.move_bottom();
+    game.rotate_right();
+    game.move_right();
+    game.rotate_left();
+    game.move_bottom();
+    game.rotate_right();
+    game.move_right();
+    game.commit();
+
+    // Type I
+    game.move_left();
+    game.move_left();
+    game.move_left();
+    game.rotate_right();
+    game.move_left();
+    game.move_bottom();
+    game.rotate_right();
+    game.move_right();
+    game.rotate_left();
+    game.move_bottom();
+    game.rotate_left();
+    game.move_left();
+    game.commit();
+
+    // Type I
+    game.move_left();
+    game.move_left();
+    game.move_left();
+    game.rotate_right();
+    game.move_left();
+    game.move_bottom();
+    game.rotate_right();
+    game.move_right();
+    game.rotate_left();
+    game.move_bottom();
+    game.commit();
+
+    // Type I
+    game.move_left();
+    game.move_left();
+    game.move_left();
+    game.rotate_right();
+    game.move_left();
+    game.move_bottom();
+    game.rotate_right();
+    game.move_right();
+    game.commit();
+
+    // Type I
+    game.move_left();
+    game.move_left();
+    game.move_left();
+    game.rotate_right();
+    game.move_left();
+    game.move_bottom();
+    game.commit();
+
+    expect(game.field.is_perfect).to.be.true;
   });
 
   it("should freeze", () => {

@@ -268,9 +268,12 @@ namespace entry {
       }
 
       var frame:HTMLFrameElement = <HTMLFrameElement>document.getElementById("tetfu");
+      frame.onload = () => {
+        frame.width = 550;
+        frame.height = frame.contentDocument.body.scrollHeight;
+      };
       frame.src = targets["List"] + param;
-      frame.width = 550;
-      frame.width = frame.scrollHeight;
+      console.log('hello')
     }
   }
 

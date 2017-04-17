@@ -76,38 +76,38 @@ export namespace mino {
   }
 
   namespace minos {
-    let tetrimino_map: { [type: number] : PositionType[] } = {};
-    tetrimino_map[Type.T] = [[0, 0], [1, 0], [-1, 0], [0, 1]];
-    tetrimino_map[Type.I] = [[-1, 0], [0, 0], [1, 0], [2, 0]];
-    tetrimino_map[Type.S] = [[0, 0], [-1, 0], [0, 1], [1, 1]];
-    tetrimino_map[Type.Z] = [[0, 0], [1, 0], [0, 1], [-1, 1]];
-    tetrimino_map[Type.L] = [[0, 0], [-1, 0], [1, 0], [1, 1]];
-    tetrimino_map[Type.J] = [[0, 0], [1, 0], [-1, 0], [-1, 1]];
-    tetrimino_map[Type.O] = [[0, 0], [1, 0], [0, 1], [1, 1]];
+    let mino_map: { [type: number] : PositionType[] } = {};
+    mino_map[Type.T] = [[0, 0], [1, 0], [-1, 0], [0, 1]];
+    mino_map[Type.I] = [[-1, 0], [0, 0], [1, 0], [2, 0]];
+    mino_map[Type.S] = [[0, 0], [-1, 0], [0, 1], [1, 1]];
+    mino_map[Type.Z] = [[0, 0], [1, 0], [0, 1], [-1, 1]];
+    mino_map[Type.L] = [[0, 0], [-1, 0], [1, 0], [1, 1]];
+    mino_map[Type.J] = [[0, 0], [1, 0], [-1, 0], [-1, 1]];
+    mino_map[Type.O] = [[0, 0], [1, 0], [0, 1], [1, 1]];
 
     export function create_mino(type:Type, rotate?:Rotate): Mino {
-      if (!(type in tetrimino_map))
-        throw new RangeError('Not found type in tetrimino map');
+      if (!(type in mino_map))
+        throw new RangeError('Not found type in mino map');
 
       if (rotate === undefined)
         rotate = Rotate.Normal;
 
       let position:PositionType[] = [];
-      for (let pos of tetrimino_map[type])
+      for (let pos of mino_map[type])
         position.push([pos[0], pos[1]]);
 
-      let tetrimino = new Mino(block(type), position);
+      let mino = new Mino(block(type), position);
 
       if (rotate === Rotate.Right) {
-        tetrimino.rotate_right();
+        mino.rotate_right();
       } else if (rotate === Rotate.Left) {
-        tetrimino.rotate_left();
+        mino.rotate_left();
       } else if (rotate === Rotate.Reverse) {
-        tetrimino.rotate_right();
-        tetrimino.rotate_right();
+        mino.rotate_right();
+        mino.rotate_right();
       }
 
-      return tetrimino;
+      return mino;
     }
 
     export function create_mino_by_name(type_name:String): Mino {
