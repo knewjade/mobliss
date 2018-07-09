@@ -14,23 +14,23 @@ export namespace image {
   }
 
   let images_paths:{ [type: string] : string } = {};
-  images_paths["Type:" + Type.S] = "../img/green.png";
-  images_paths["Type:" + Type.Z] = "../img/red.png";
-  images_paths["Type:" + Type.L] = "../img/orange.png";
-  images_paths["Type:" + Type.J] = "../img/blue.png";
-  images_paths["Type:" + Type.T] = "../img/purple.png";
-  images_paths["Type:" + Type.O] = "../img/yellow.png";
-  images_paths["Type:" + Type.I] = "../img/sky.png";
-  images_paths["Type:" + Type.Empty] = "../img/empty.png";
-  images_paths["Type:" + Type.Gray] = "../img/gray.png";
-  images_paths["Candidate"] = "../img/candidate.png";
-  images_paths[Names.refresh] = "../img/refresh.png";
-  images_paths[Names.search] = "../img/search.png";
-  images_paths[Names.fumen] = "../img/fumen.png";
-  images_paths[Names.undo] = "../img/undo.png";
-  images_paths[Names.rotate_right] = "../img/rotate_right.png";
-  images_paths[Names.rotate_left] = "../img/rotate_left.png";
-  images_paths["Arrow"] = "../img/arrow.png";
+  images_paths["Type:" + Type.S] = "./img/green.png";
+  images_paths["Type:" + Type.Z] = "./img/red.png";
+  images_paths["Type:" + Type.L] = "./img/orange.png";
+  images_paths["Type:" + Type.J] = "./img/blue.png";
+  images_paths["Type:" + Type.T] = "./img/purple.png";
+  images_paths["Type:" + Type.O] = "./img/yellow.png";
+  images_paths["Type:" + Type.I] = "./img/sky.png";
+  images_paths["Type:" + Type.Empty] = "./img/empty.png";
+  images_paths["Type:" + Type.Gray] = "./img/gray.png";
+  images_paths["Candidate"] = "./img/candidate.png";
+  images_paths[Names.refresh] = "./img/refresh.png";
+  images_paths[Names.search] = "./img/search.png";
+  images_paths[Names.fumen] = "./img/fumen.png";
+  images_paths[Names.undo] = "./img/undo.png";
+  images_paths[Names.rotate_right] = "./img/rotate_right.png";
+  images_paths[Names.rotate_left] = "./img/rotate_left.png";
+  images_paths["Arrow"] = "./img/arrow.png";
 
   function wrap_load_image(key:string): Promise<[string, HTMLImageElement]> {
     return new Promise((resolve, reject) => {
