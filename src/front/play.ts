@@ -1,7 +1,7 @@
-import {mino as _mino} from 'mino';
+import { mino, mino as _mino } from 'mino';
 import {field as _field} from 'field';
 import {game as _game} from 'game';
-import {steps as _steps} from 'steps';
+import { steps, steps as _steps } from 'steps';
 import {params as _params} from 'params';
 import {lock_candidate as _lock_candidate} from 'lock_candidate';
 
@@ -14,6 +14,7 @@ import {points as _points} from 'front/points';
 // 4canvasのIDは固定とする
 // windowsサイズは動的に変更できないものとする
 export namespace play {
+  type Type = _mino.Type;
   type Canvas = _canvas.Canvas;
   type DrawEventFunc = _canvas.DrawEventFunc;
   type ImageLoader = _image.ImageLoader;
@@ -41,6 +42,7 @@ export namespace play {
   let LockCandidate = _lock_candidate.LockCandidate;
   let Params = _params.Params;
   let FieldType = _params.FieldType;
+  let create_random_bag = steps.create_random_bag;
 
   let mino = _mino.mino;
   let create_initial_field = _field.create_initial_field;
@@ -107,7 +109,7 @@ export namespace play {
       let bag_generator_and_length:[BagGenerator, number] = this.create_bag_generator(params.order_type);
       let bag_generator = bag_generator_and_length[0];
       let bag_length = bag_generator_and_length[1];
-      let game_generator:GameGenerator = this.create_game_generator(params.field_type, params.next_count, bag_generator);
+      let game_generator:GameGenerator = this.create_game_generator(params.field_type, params.order_type, params.next_count, bag_generator);
 
       // OperationCallbackTypeの設定
       let operation_callback:OperationCallbackType = (event_name:string, controller:Controller) => {
@@ -156,37 +158,69 @@ export namespace play {
 
     // [generator or null, bagの個数]
     private create_bag_generator(order_type:string): [BagGenerator, number] {
+      // はじめを指定した数だけスライドする
+      if (order_type.startsWith('>>')) {
+        return [null, 7];
+      }
+
+      // 固定ミノ+ランダム
+      if (order_type.endsWith('*')) {
+        return [null, 7];
+      }
+
       if (order_type === DEFAULT_ORDER_VALUE) {
         return [null, 7];
-      } else {
-        // 空文字 or undefinedのときはdefault
-        if (!order_type)
-          return [null, 7];
-
-        // Typeに変換
-        let types = order_type.toUpperCase().split('').map((e) => {
-          try {
-            return block_by_name(e).type;
-          } catch (e) {
-            return null;
-          }
-        });
-
-        // 不明な文字が含まれるときはdefault
-        if (types.indexOf(null) !== -1)
-          return [null, 7];
-
-        return [() => {
-          return types;
-        }, 7];
       }
+
+      // 空文字 or undefinedのときはdefault
+      if (!order_type)
+        return [null, 7];
+
+      // Typeに変換
+      let types = order_type.toUpperCase().split('').map((e) => {
+        try {
+          return block_by_name(e).type;
+        } catch (e) {
+          return null;
+        }
+      });
+
+      // 不明な文字が含まれるときはdefault
+      if (types.indexOf(null) !== -1)
+        return [null, 7];
+
+      return [() => {
+        return types;
+      }, 7];
     }
 
-    private create_game_generator(field_type:FieldType, next_count:number, bag_generator:BagGenerator): GameGenerator {
+    private create_game_generator(field_type:FieldType, order_type:string, next_count:number, bag_generator:BagGenerator): GameGenerator {
       if (field_type === FieldType.Empty) {
         return () => {
-          let field = create_initial_field(23, FIELD_WIDTH);
-          let steps = new Steps([], next_count, bag_generator);
+            // はじめを指定した数だけスライドする
+            let types:Type[] = [];
+            if (order_type.startsWith('>>')) {
+                types = create_random_bag().slice(Number(order_type.substr(2).trim()[0]));
+            }
+
+            // 固定ミノ+ランダム
+            if (order_type.endsWith('*')) {
+                // Typeに変換
+                types = order_type.substring(0, order_type.lastIndexOf('*')).toUpperCase().split('').map((e) => {
+                    try {
+                        return block_by_name(e).type;
+                    } catch (e) {
+                        return null;
+                    }
+                });
+
+                // 不明な文字が含まれるときはdefault
+                if (types.indexOf(null) !== -1)
+                    types = [];
+            }
+
+            let field = create_initial_field(23, FIELD_WIDTH);
+          let steps = new Steps(types, next_count, bag_generator);
           return new Game(field, steps);
         };
       } else if (field_type === FieldType.PerfectTRight) {
@@ -512,7 +546,7 @@ export namespace play {
       // パラメータの取得。Getパラメータになければ、キャッシュから取得
       let session_params = localStorage.getItem(SESSION_PARAMS_NAME);
       console.log("Session:", SESSION_PARAMS_NAME, session_params);
-      let param_text:string = location.search.substr(1) || session_params;
+      let param_text:string = decodeURI(location.search.substr(1)) || session_params;
 
       // Paramsオブジェクトの作成
       let params:Params = null;

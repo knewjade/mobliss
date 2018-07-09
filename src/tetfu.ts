@@ -170,7 +170,7 @@ export namespace tetfu {
         else if (type == Type.O && rotate == Rotate.Reverse)
           x -= 1;
         else if (type == Type.O && rotate == Rotate.Left)
-          x -= 1, y -= 1;
+          x -= 1, y += 1;
         else if (type == Type.I && rotate == Rotate.Reverse)
           x -= 1;
         else if (type == Type.I && rotate == Rotate.Left)

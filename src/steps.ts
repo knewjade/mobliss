@@ -12,7 +12,7 @@ export namespace steps {
 
   const all_types = [Type.T, Type.L, Type.J, Type.S, Type.Z, Type.I, Type.O];
 
-  function create_random_bag(): Type[] {
+  export function create_random_bag(): Type[] {
     var shuffle = function (arr: any[]) {
       var i, j, temp;
       arr = arr.slice();
