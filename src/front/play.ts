@@ -109,7 +109,7 @@ export namespace play {
       let bag_generator_and_length:[BagGenerator, number] = this.create_bag_generator(params.order_type);
       let bag_generator = bag_generator_and_length[0];
       let bag_length = bag_generator_and_length[1];
-      let game_generator:GameGenerator = this.create_game_generator(params.field_type, params.order_type, params.next_count, bag_generator);
+      let game_generator:GameGenerator = this.create_game_generator(params, bag_generator);
 
       // OperationCallbackTypeの設定
       let operation_callback:OperationCallbackType = (event_name:string, controller:Controller) => {
@@ -194,7 +194,10 @@ export namespace play {
       }, 7];
     }
 
-    private create_game_generator(field_type:FieldType, order_type:string, next_count:number, bag_generator:BagGenerator): GameGenerator {
+    private create_game_generator(params: Params, bag_generator:BagGenerator): GameGenerator {
+      const field_type = params.field_type;
+      const order_type = params.order_type;
+      const next_count = params.next_count;
       if (field_type === FieldType.Empty) {
         return () => {
             // はじめを指定した数だけスライドする
@@ -219,7 +222,7 @@ export namespace play {
                     types = [];
             }
 
-            let field = create_initial_field(23, FIELD_WIDTH);
+          let field = create_initial_field(23, FIELD_WIDTH);
           let steps = new Steps(types, next_count, bag_generator);
           return new Game(field, steps);
         };
@@ -268,6 +271,51 @@ export namespace play {
           game.commit();
 
           return game;
+        };
+      } else if (field_type === FieldType.Garbage) {
+        return () => {
+          // はじめを指定した数だけスライドする
+          let types:Type[] = [];
+          if (order_type.startsWith('>>')) {
+            types = create_random_bag().slice(Number(order_type.substr(2).trim()[0]));
+          }
+
+          // 固定ミノ+ランダム
+          if (order_type.endsWith('*')) {
+            // Typeに変換
+            types = order_type.substring(0, order_type.lastIndexOf('*')).toUpperCase().split('').map((e) => {
+              try {
+                return block_by_name(e).type;
+              } catch (e) {
+                return null;
+              }
+            });
+
+            // 不明な文字が含まれるときはdefault
+            if (types.indexOf(null) !== -1)
+              types = [];
+          }
+
+          const garbage_count = params.garbage_count;
+          const garbage_step = params.garbage_step;
+
+          let field = create_initial_field(23, FIELD_WIDTH);
+          let step = 0;
+          let hole_x = Math.floor(10 * Math.random());
+          for (let y = garbage_count - 1; 0 <= y; y--) {
+            for (let x = 0; x < FIELD_WIDTH; x++) {
+              if (x !== hole_x)
+                field.set_block(x, y, Type.Gray)
+            }
+            step += 1;
+            if (garbage_step <= step) {
+              step = 0;
+              const hole = Math.floor(9 * Math.random());
+              hole_x = hole < hole_x ? hole : hole + 1;
+            }
+          }
+          let steps = new Steps(types, next_count, bag_generator);
+          return new Game(field, steps);
         };
       } else {
         throw Error('Illegal error: Not found Field Type');

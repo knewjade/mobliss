@@ -22,7 +22,7 @@ namespace entry {
   namespace index {
     declare var document:any;
 
-    var SESSION_PARAMS_NAME = "Params";
+    const SESSION_PARAMS_NAME = "Params";
 
     type ToFormFuncType = (params:Params) => any;
     type ToParamFuncType = (params:Params, value:any) => void;
@@ -95,6 +95,12 @@ namespace entry {
       },
       "FieldType": {
         type: FormType.Select, form_name: "field_type", to_value: get_field_type("field_type"), to_param: set_field_type("field_type")
+      },
+      "GarbageCount": {
+        type: FormType.Text, form_name: "garbage_count", to_value: get_integer("garbage_count"), to_param: set_integer("garbage_count")
+      },
+      "GarbageStep": {
+        type: FormType.Text, form_name: "garbage_step", to_value: get_integer("garbage_step"), to_param: set_integer("garbage_step")
       },
       "OrderType": {
         type: FormType.Custom, form_name: null, to_value: get_string("order_type"), to_param: set_string("order_type")
@@ -226,6 +232,8 @@ namespace entry {
         }
       }
 
+      console.log(params);
+
       let text = params.text;
       localStorage.setItem(SESSION_PARAMS_NAME, text);
       console.log(text);
@@ -235,9 +243,8 @@ namespace entry {
   }
 
   namespace jump {
-    export function entry(e:Event): void {
-      var param = location.search.substr(2);
-      var div = document.getElementById("link");
+    export function entry(): void {
+      const param = location.search.substr(2);
 
       if (param.slice(0, 4) !== "115@") {
         document.body.innerHTML = 'parameter error';

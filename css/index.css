@@ -9,3 +9,7 @@ section.category, footer {
 input {
   margin-left: 0px;
 }
+
+.hidden {
+  display: none;
+}

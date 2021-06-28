@@ -50,6 +50,8 @@ export namespace params {
       "PivotIV": ["pi", get_index(1), "L"],
       "PivotO": ["po", get_index(0), "N"],
       "FieldType": ["fld", pass, "Empty"],
+      "GarbageCount": ["gc", get_number_in_range(1, 19), "15"],
+      "GarbageStep": ["gs", get_number_in_range(1, 19), "1"],
       "OrderType": ["ord", pass, DEFAULT_ORDER_VALUE],
       "CandidateVisibleFlag": ["fcv", get_index(0), "1"],
       "CandidateLimitPerfectFlag": ["fclp", get_index(0), "0"],
@@ -123,6 +125,12 @@ export namespace params {
       "fld": [
         { key: "FieldType", func: get_key , default: get_default },
       ],
+      "gc": [
+        { key: "GarbageCount", func: get_key , default: get_default },
+      ],
+      "gs": [
+        { key: "GarbageStep", func: get_key , default: get_default },
+      ],
       "ord": [
         { key: "OrderType", func: get_key , default: get_default },
       ],
@@ -195,6 +203,7 @@ export namespace params {
     Empty,
     PerfectTRight,
     PerfectTLeft,
+    Garbage,
   }
 
   namespace map {
@@ -229,6 +238,7 @@ export namespace params {
       'Empty': FieldType.Empty,
       'PerfectTRight': FieldType.PerfectTRight,
       'PerfectTLeft': FieldType.PerfectTLeft,
+      'Garbage': FieldType.Garbage,
     };
 
     let from_field_type_map:{ [type:number]: string } = {};
@@ -256,6 +266,7 @@ export namespace params {
     private _params:ParamType = {};
 
     constructor(text:string='') {
+      text = text || '';
       let input = parse_text(text);
       this._params = version001.parse(input);
     }
@@ -294,6 +305,14 @@ export namespace params {
 
     public get field_type(): FieldType {
       return Params.parse_to_field_type(this._params['FieldType']);
+    }
+
+    public get garbage_count(): number {
+      return Params.parse_to_integer(this._params['GarbageCount']);
+    }
+
+    public get garbage_step(): number {
+      return Params.parse_to_integer(this._params['GarbageStep']);
     }
 
     public get order_type(): string {
@@ -402,6 +421,14 @@ export namespace params {
 
     public set field_type(type:FieldType) {
       this._params['FieldType'] = Params.parse_field_type_to_string(type);
+    }
+
+    public set garbage_count(value:number) {
+      this._params['GarbageCount'] = Params.parse_number_to_string(value);
+    }
+
+    public set garbage_step(value:number) {
+      this._params['GarbageStep'] = Params.parse_number_to_string(value);
     }
 
     public set order_type(value:string) {
