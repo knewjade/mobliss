@@ -288,6 +288,7 @@
                   <input class="form-check-input" type="radio" name="pivot_o" value="R"> <img src="img/o_left.png" alt="O Left">
                 </label>
               </div>
+            </section>
           </section>
         </section>
       </section>
@@ -377,7 +378,7 @@
     </footer>
   </div>
 
-  <script type="text/javascript" src="js/bundle.js"></script>
+  <script type="text/javascript" src="js/bundle.js?p=(new Date()).getTime()"></script>
   <script>
     window.onload = function (event) {
       window.entry_point.index(event)
@@ -385,16 +386,16 @@
       const element = document.getElementById('field_type')
       if (element) {
         const onChange = () => {
-          const index = element.selectedIndex
-          const detailElement = document.getElementById('garbage_details')
+          const index = element.selectedIndex;
+          const detailElement = document.getElementById('garbage_details');
           if (element.options[index].value === 'Garbage') {
-            detailElement.classList.remove('hidden')
+            detailElement.classList.remove('hidden');
           } else {
-            detailElement.classList.add('hidden')
+            detailElement.classList.add('hidden');
           }
         }
-        element.addEventListener('change', onChange)
-        onChange()  // 読み込み時に1回更新する
+        element.addEventListener('change', onChange);
+        onChange();  // 読み込み時に1回更新する
       }
     }
   </script>
